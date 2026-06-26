@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.expo/
+*.tsbuildinfo
+.next/
+coverage/
+*.log
+.env
+.env.local
+.env.production
+.env.development
+.turbo/

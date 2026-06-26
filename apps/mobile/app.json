@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Food Bridge",
+    "slug": "food-bridge",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "food-bridge",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
