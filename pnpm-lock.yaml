@@ -25,12 +25,18 @@ importers:
       bcrypt:
         specifier: ^6.0.0
         version: 6.0.0
+      cloudinary:
+        specifier: ^2.10.0
+        version: 2.10.0
       cors:
         specifier: ^2.8.5
         version: 2.8.6
       dotenv:
         specifier: ^16.4.7
         version: 16.6.1
+      expo-server-sdk:
+        specifier: ^6.1.0
+        version: 6.1.0
       express:
         specifier: ^4.21.1
         version: 4.22.2
@@ -49,6 +55,9 @@ importers:
       jsonwebtoken:
         specifier: ^9.0.3
         version: 9.0.3
+      node-cron:
+        specifier: ^4.5.0
+        version: 4.5.0
       zod:
         specifier: ^3.23.0
         version: 3.25.76
@@ -71,6 +80,9 @@ importers:
       "@types/node":
         specifier: ^20.17.0
         version: 20.19.43
+      "@types/node-cron":
+        specifier: ^3.0.11
+        version: 3.0.11
       "@typescript-eslint/eslint-plugin":
         specifier: ^7.18.0
         version: 7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)
@@ -2321,6 +2333,12 @@ packages:
         integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==,
       }
 
+  "@types/node-cron@3.0.11":
+    resolution:
+      {
+        integrity: sha512-0ikrnug3/IyneSHqCBeslAhlK2aBfYek1fGo4bP4QnZPmiqSGRK+Oy7ZMisLWkesffJvQ1cqAcBnJC+8+nxIAg==,
+      }
+
   "@types/node@20.19.43":
     resolution:
       {
@@ -3346,6 +3364,13 @@ packages:
       }
     engines: { node: ">=0.8" }
 
+  cloudinary@2.10.0:
+    resolution:
+      {
+        integrity: sha512-sY09kYg7wprkndAOjZBAYqFZqwL+SxnEGcAvksOvFA+5upnFn949UjkEkHKNSwkBtW/xRDd0p6NgbSXZcxkI3w==,
+      }
+    engines: { node: ">=9" }
+
   color-convert@1.9.3:
     resolution:
       {
@@ -3800,6 +3825,12 @@ packages:
       }
     engines: { node: ">=18" }
 
+  err-code@2.0.3:
+    resolution:
+      {
+        integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==,
+      }
+
   error-stack-parser@2.1.4:
     resolution:
       {
@@ -4206,6 +4237,13 @@ packages:
         optional: true
       react-server-dom-webpack:
         optional: true
+
+  expo-server-sdk@6.1.0:
+    resolution:
+      {
+        integrity: sha512-ISuax1AQ7cpM5RAqcu8gVcoLL0ZKskJ5OLoMWmdITBe9nYjTucjdGyBq817YkIvTcj1pAUwx+9toUT7l/V7thA==,
+      }
+    engines: { node: ">=20" }
 
   expo-server@1.0.7:
     resolution:
@@ -5656,6 +5694,12 @@ packages:
         integrity: sha512-wIkUCfVKpVsWo3JSZlc+8MB5it+2AN5W8J7YVMST30UrvcQNZ1Okbj+rbVniijTWE6FGYy4XJq/rHkas8qJMLQ==,
       }
 
+  lodash@4.18.1:
+    resolution:
+      {
+        integrity: sha512-dMInicTPVE8d1e5otfwmmjlxkZoUpiVLwyeTdUsi/Caj/gfzzblBcCE5sRHV/AsjuCmxWrte2TNGSYuCeCq+0Q==,
+      }
+
   log-symbols@2.2.0:
     resolution:
       {
@@ -6154,6 +6198,13 @@ packages:
         integrity: sha512-c5Ko1fZJIJmzhFIkhRN76WTq+fC6tWnGy9CXA0fA+XygsWZmEwG8vmbkNqxMyoaa0Tin4djul49NzdVcJJcjeA==,
       }
     engines: { node: ^18 || ^20 || >= 21 }
+
+  node-cron@4.5.0:
+    resolution:
+      {
+        integrity: sha512-4Trh+kjvbXokyJkwQumvD5YAgeJfgHLR/sKyu71uSmxfCR5QMO1hldpvmFZOICN5pLgNY+J5Y8+ar3XKo5/4tQ==,
+      }
+    engines: { node: ">=20" }
 
   node-exports-info@1.6.2:
     resolution:
@@ -6687,6 +6738,19 @@ packages:
       }
     engines: { node: ">=0.4.0" }
 
+  promise-limit@2.7.0:
+    resolution:
+      {
+        integrity: sha512-7nJ6v5lnJsXwGprnGXga4wx6d1POjvi5Qmf1ivTRxTjH4Z/9Czja/UCMLVmB9N93GeWOU93XaFaEt6jbuoagNw==,
+      }
+
+  promise-retry@2.0.1:
+    resolution:
+      {
+        integrity: sha512-y+WKFlBR8BGXnsNlIHFGPZmyDf3DFMoLhaflAnyZgV6rG6xu+JwesTo2Q9R6XwYmtmwAFCkAk3e35jEdoeh/3g==,
+      }
+    engines: { node: ">=10" }
+
   promise@7.3.1:
     resolution:
       {
@@ -7114,6 +7178,13 @@ packages:
         integrity: sha512-oMA2dcrw6u0YfxJQXm342bFKX/E4sG9rbTzO9ptUcR/e8A33cHuvStiYOwH7fszkZlZ1z/ta9AAoPk2F4qIOHA==,
       }
     engines: { node: ">=18" }
+
+  retry@0.12.0:
+    resolution:
+      {
+        integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==,
+      }
+    engines: { node: ">= 4" }
 
   reusify@1.1.0:
     resolution:
@@ -7892,6 +7963,13 @@ packages:
         integrity: sha512-YmfV3YnEDzXRC5lZ2jWtWWHKGUm1zIt8AhesR1tens+HTNv+YZlN/dp6G727LOvMJ8xjP9Be7Y2Sdr96LDm+pg==,
       }
     engines: { node: ">=18.17" }
+
+  undici@7.28.0:
+    resolution:
+      {
+        integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==,
+      }
+    engines: { node: ">=20.18.1" }
 
   unicode-canonical-property-names-ecmascript@2.0.1:
     resolution:
@@ -10001,6 +10079,8 @@ snapshots:
 
   "@types/ms@2.1.0": {}
 
+  "@types/node-cron@3.0.11": {}
+
   "@types/node@20.19.43":
     dependencies:
       undici-types: 6.21.0
@@ -10684,6 +10764,10 @@ snapshots:
 
   clone@1.0.4: {}
 
+  cloudinary@2.10.0:
+    dependencies:
+      lodash: 4.18.1
+
   color-convert@1.9.3:
     dependencies:
       color-name: 1.1.3
@@ -10906,6 +10990,8 @@ snapshots:
   env-editor@0.4.2: {}
 
   environment@1.1.0: {}
+
+  err-code@2.0.3: {}
 
   error-stack-parser@2.1.4:
     dependencies:
@@ -11365,6 +11451,12 @@ snapshots:
       - "@types/react"
       - "@types/react-dom"
       - supports-color
+
+  expo-server-sdk@6.1.0:
+    dependencies:
+      promise-limit: 2.7.0
+      promise-retry: 2.0.1
+      undici: 7.28.0
 
   expo-server@1.0.7: {}
 
@@ -12260,6 +12352,8 @@ snapshots:
 
   lodash.throttle@4.1.1: {}
 
+  lodash@4.18.1: {}
+
   log-symbols@2.2.0:
     dependencies:
       chalk: 2.4.2
@@ -12742,6 +12836,8 @@ snapshots:
 
   node-addon-api@8.8.0: {}
 
+  node-cron@4.5.0: {}
+
   node-exports-info@1.6.2:
     dependencies:
       array.prototype.flatmap: 1.3.3
@@ -13024,6 +13120,13 @@ snapshots:
   proc-log@4.2.0: {}
 
   progress@2.0.3: {}
+
+  promise-limit@2.7.0: {}
+
+  promise-retry@2.0.1:
+    dependencies:
+      err-code: 2.0.3
+      retry: 0.12.0
 
   promise@7.3.1:
     dependencies:
@@ -13358,6 +13461,8 @@ snapshots:
     dependencies:
       onetime: 7.0.0
       signal-exit: 4.1.0
+
+  retry@0.12.0: {}
 
   reusify@1.1.0: {}
 
@@ -13851,6 +13956,8 @@ snapshots:
   undici-types@6.21.0: {}
 
   undici@6.27.0: {}
+
+  undici@7.28.0: {}
 
   unicode-canonical-property-names-ecmascript@2.0.1: {}
 

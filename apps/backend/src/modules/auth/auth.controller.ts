@@ -62,7 +62,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, refreshTokenHash, ...userWithoutSecrets } = user;
+    const { passwordHash: _ph, refreshTokenHash: _rh, ...userWithoutSecrets } = user;
 
     res.status(StatusCodes.CREATED).json({
       success: true,
@@ -104,7 +104,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { passwordHash, refreshTokenHash, ...userWithoutSecrets } = user;
+    const { passwordHash: _ph, refreshTokenHash: _rh, ...userWithoutSecrets } = user;
 
     res.status(StatusCodes.OK).json({
       success: true,

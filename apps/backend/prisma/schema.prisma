@@ -29,7 +29,7 @@ enum Unit {
 enum ListingStatus {
   AVAILABLE
   RESERVED
-  COMPLETED
+  COLLECTED
   CANCELLED
 }
 
@@ -51,6 +51,7 @@ model User {
   name               String?
   phone              String?
   refreshTokenHash   String?
+  expoPushToken      String?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
 
@@ -61,17 +62,23 @@ model User {
 }
 
 model FoodListing {
-  id          String        @id @default(uuid())
-  donorId     String
-  donor       User          @relation(fields: [donorId], references: [id])
-  title       String
-  description String?
-  quantity    Float
-  unit        Unit
-  expiryDate  DateTime
-  status      ListingStatus @default(AVAILABLE)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id            String        @id @default(uuid())
+  donorId       String
+  donor         User          @relation(fields: [donorId], references: [id])
+  title         String
+  description   String?
+  foodType      String
+  quantity      Float
+  unit          Unit
+  pickupLat     Float
+  pickupLng     Float
+  pickupAddress String
+  photos        String[]
+  preparedAt    DateTime
+  safeUntil     DateTime
+  status        ListingStatus @default(AVAILABLE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 
   requests FoodRequest[]
 }
@@ -95,7 +102,9 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   type      String
+  title     String
   message   String
+  data      Json?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
