@@ -6,3 +6,107 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role {
+  DONOR
+  RECEIVER
+  ADMIN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum Unit {
+  KG
+  LITER
+  ITEM
+  PORTION
+}
+
+enum ListingStatus {
+  AVAILABLE
+  RESERVED
+  COMPLETED
+  CANCELLED
+}
+
+enum RequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id                 String             @id @default(uuid())
+  email              String             @unique
+  passwordHash       String
+  role               Role
+  verificationStatus VerificationStatus @default(PENDING)
+  orgName            String?
+  name               String?
+  phone              String?
+  refreshTokenHash   String?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  listings              FoodListing[]
+  requests              FoodRequest[]
+  notifications         Notification[]
+  verificationDocuments VerificationDocument[]
+}
+
+model FoodListing {
+  id          String        @id @default(uuid())
+  donorId     String
+  donor       User          @relation(fields: [donorId], references: [id])
+  title       String
+  description String?
+  quantity    Float
+  unit        Unit
+  expiryDate  DateTime
+  status      ListingStatus @default(AVAILABLE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  requests FoodRequest[]
+}
+
+model FoodRequest {
+  id         String        @id @default(uuid())
+  listingId  String
+  listing    FoodListing   @relation(fields: [listingId], references: [id])
+  receiverId String
+  receiver   User          @relation(fields: [receiverId], references: [id])
+  status     RequestStatus @default(PENDING)
+  message    String?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  @@index([listingId, status])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VerificationDocument {
+  id          String             @id @default(uuid())
+  userId      String
+  user        User               @relation(fields: [userId], references: [id])
+  documentUrl String
+  status      VerificationStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
