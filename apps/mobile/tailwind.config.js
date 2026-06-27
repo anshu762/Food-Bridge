@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./app/**/*.{ts,tsx}', './src/**/*.{ts,tsx}'],
-  presets: [require('nativewind/preset')],
+  // NativeWind v2: no preset needed (that was v4-only).
+  // The babel plugin handles className → style transforms directly.
   theme: {
     extend: {
       colors: {
