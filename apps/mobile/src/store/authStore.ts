@@ -1,9 +1,37 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
+import { Platform } from 'react-native';
 import { router } from 'expo-router';
 
 // Make sure these match the shared types from backend
 export type Role = 'DONOR' | 'RECEIVER' | 'ADMIN';
+
+/**
+ * Web-safe storage wrapper.
+ * expo-secure-store is native-only (Android/iOS).
+ * On web, we fall back to localStorage which is acceptable for local dev/testing.
+ * In production, the app runs on native so SecureStore is always used.
+ */
+const storage = {
+  get: async (key: string): Promise<string | null> => {
+    if (Platform.OS === 'web') return localStorage.getItem(key);
+    return SecureStore.getItemAsync(key);
+  },
+  set: async (key: string, value: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.setItem(key, value);
+      return;
+    }
+    await SecureStore.setItemAsync(key, value);
+  },
+  del: async (key: string): Promise<void> => {
+    if (Platform.OS === 'web') {
+      localStorage.removeItem(key);
+      return;
+    }
+    await SecureStore.deleteItemAsync(key);
+  },
+};
 
 export interface User {
   id: string;
@@ -31,13 +59,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (user, accessToken, refreshToken) => {
     await Promise.all([
-      SecureStore.setItemAsync('user', JSON.stringify(user)),
-      SecureStore.setItemAsync('accessToken', accessToken),
-      SecureStore.setItemAsync('refreshToken', refreshToken),
+      storage.set('user', JSON.stringify(user)),
+      storage.set('accessToken', accessToken),
+      storage.set('refreshToken', refreshToken),
     ]);
     set({ user, accessToken, isHydrated: true });
 
-    // Route based on role
+    // Route based on role after successful login
     if (user.role === 'DONOR') router.replace('/(donor)');
     else if (user.role === 'RECEIVER') router.replace('/(receiver)');
     else if (user.role === 'ADMIN') router.replace('/(admin)');
@@ -45,24 +73,24 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: async () => {
     await Promise.all([
-      SecureStore.deleteItemAsync('user'),
-      SecureStore.deleteItemAsync('accessToken'),
-      SecureStore.deleteItemAsync('refreshToken'),
+      storage.del('user'),
+      storage.del('accessToken'),
+      storage.del('refreshToken'),
     ]);
     set({ user: null, accessToken: null });
     router.replace('/(auth)/login');
   },
 
   updateToken: (accessToken: string) => {
-    SecureStore.setItemAsync('accessToken', accessToken);
+    storage.set('accessToken', accessToken);
     set({ accessToken });
   },
 
   hydrate: async () => {
     try {
       const [userStr, accessToken] = await Promise.all([
-        SecureStore.getItemAsync('user'),
-        SecureStore.getItemAsync('accessToken'),
+        storage.get('user'),
+        storage.get('accessToken'),
       ]);
 
       if (userStr && accessToken) {
