@@ -82,16 +82,6 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
-        <View className="items-end mb-6">
-          <Button
-            variant="ghost"
-            size="sm"
-            onPress={() => router.push('/(auth)/forgot-password' as any)}
-          >
-            <Text className="text-primary-600 font-medium">Forgot password?</Text>
-          </Button>
-        </View>
-
         <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading}>
           Log In
         </Button>

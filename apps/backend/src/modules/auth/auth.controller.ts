@@ -4,12 +4,7 @@ import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
 import { AppError } from '../../middleware/errorHandler';
-import {
-  RegisterInput,
-  LoginInput,
-  ForgotPasswordInput,
-  ResetPasswordInput,
-} from '@food-bridge/shared';
+import { RegisterInput, LoginInput } from '@food-bridge/shared';
 
 const prisma = new PrismaClient();
 
@@ -183,82 +178,6 @@ export const logout = async (req: Request, res: Response, next: NextFunction) =>
     res.status(StatusCodes.OK).json({
       success: true,
       message: 'Logged out successfully',
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const forgotPassword = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { email } = req.body as ForgotPasswordInput;
-
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      // Return success even if user not found to prevent email enumeration
-      return res.status(StatusCodes.OK).json({
-        success: true,
-        message: 'If the email exists, a reset link has been sent.',
-      });
-    }
-
-    const JWT_RESET_SECRET = process.env.JWT_RESET_SECRET || 'fallback_reset_secret';
-    const resetToken = jwt.sign({ id: user.id }, JWT_RESET_SECRET, { expiresIn: '1h' });
-
-    // TODO: Integrate actual email service here
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(
-        `[DEV] Password reset link generated for ${email}: /reset-password?token=${resetToken}`,
-      );
-    }
-
-    res.status(StatusCodes.OK).json({
-      success: true,
-      message: 'If the email exists, a reset link has been sent.',
-    });
-  } catch (error) {
-    next(error);
-  }
-};
-
-export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    const { token, newPassword } = req.body as ResetPasswordInput;
-
-    const JWT_RESET_SECRET = process.env.JWT_RESET_SECRET || 'fallback_reset_secret';
-    let decoded;
-    try {
-      decoded = jwt.verify(token, JWT_RESET_SECRET) as { id: string };
-    } catch (error) {
-      throw new AppError('Invalid or expired reset token', StatusCodes.UNAUTHORIZED);
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.id },
-    });
-
-    if (!user) {
-      throw new AppError('Invalid or expired reset token', StatusCodes.UNAUTHORIZED);
-    }
-
-    const salt = await bcrypt.genSalt(12);
-    const passwordHash = await bcrypt.hash(newPassword, salt);
-
-    // Update password and invalidate all existing refresh tokens
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        passwordHash,
-        refreshTokenHash: null, // Invalidates existing sessions
-      },
-    });
-
-    res.status(StatusCodes.OK).json({
-      success: true,
-      message: 'Password reset successful',
     });
   } catch (error) {
     next(error);
