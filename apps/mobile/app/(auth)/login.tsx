@@ -1,11 +1,111 @@
-import { View, Text } from 'react-native';
-import { Link } from 'expo-router';
+import React, { useState } from 'react';
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from 'expo-router';
+import { loginSchema } from '@food-bridge/shared';
+import { ControlledInput } from '../../src/components/ui/Input';
+import { Button } from '../../src/components/ui/Button';
+import { useAuthStore } from '../../src/store/authStore';
+import { api } from '../../src/services/api';
+import { useToast } from '../../src/components/ui/Toast';
+import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
+import { z } from 'zod';
 
-export default function Login() {
+type LoginForm = z.infer<typeof loginSchema>;
+
+export default function LoginScreen() {
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuthStore();
+  const { showToast } = useToast();
+  const { isOnline } = useNetworkStatus();
+
+  const { control, handleSubmit } = useForm<LoginForm>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit = async (data: LoginForm) => {
+    if (!isOnline) {
+      showToast({
+        message: 'You are currently offline. Please check your connection.',
+        type: 'error',
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const res = await api.post('/auth/login', data);
+
+      const { user, accessToken, refreshToken } = res.data.data;
+      await login(user, accessToken, refreshToken);
+      // Navigation is handled by the authStore
+    } catch (error: any) {
+      showToast({
+        message: error.response?.data?.error || 'Invalid email or password. Please try again.',
+        type: 'error',
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <View className="flex-1 items-center justify-center bg-white px-6">
-      <Text className="text-2xl font-bold text-primary-600 mb-6">Log In</Text>
-      <Link href="/" className="text-accent-600 underline text-base">Back to Home</Link>
-    </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className="flex-1 bg-white"
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
+        <View className="mb-8 items-center">
+          <Text className="text-3xl font-bold text-primary-600 mb-2">Welcome Back</Text>
+          <Text className="text-gray-500 text-center text-base">
+            Log in to continue your journey with Food Bridge.
+          </Text>
+        </View>
+
+        <ControlledInput
+          control={control}
+          name="email"
+          label="Email Address"
+          placeholder="Enter your email"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <ControlledInput
+          control={control}
+          name="password"
+          label="Password"
+          placeholder="Enter your password"
+          secureTextEntryToggle
+          secureTextEntry
+        />
+
+        <View className="items-end mb-6">
+          <Button
+            variant="ghost"
+            size="sm"
+            onPress={() => router.push('/(auth)/forgot-password' as any)}
+          >
+            <Text className="text-primary-600 font-medium">Forgot password?</Text>
+          </Button>
+        </View>
+
+        <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading}>
+          Log In
+        </Button>
+
+        <View className="flex-row justify-center mt-6">
+          <Text className="text-gray-500">Don't have an account? </Text>
+          <Text
+            className="text-primary-600 font-semibold"
+            onPress={() => router.push('/(auth)/register')}
+          >
+            Sign Up
+          </Text>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
