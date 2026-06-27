@@ -3,12 +3,7 @@ import * as authController from './auth.controller';
 import { validate } from '../../middleware/validate';
 import { authRateLimiter } from '../../middleware/rateLimiter';
 import { authMiddleware } from '../../middleware/auth';
-import {
-  registerSchema,
-  loginSchema,
-  forgotPasswordSchema,
-  resetPasswordSchema,
-} from '@food-bridge/shared';
+import { registerSchema, loginSchema } from '@food-bridge/shared';
 
 const router = Router();
 
@@ -19,9 +14,6 @@ router.use(authRateLimiter);
 router.post('/register', validate(registerSchema as any), authController.register);
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/refresh', authController.refresh);
-router.post('/forgot-password', validate(forgotPasswordSchema), authController.forgotPassword);
-router.post('/reset-password', validate(resetPasswordSchema), authController.resetPassword);
-
 // Protected routes
 router.post('/logout', authMiddleware, authController.logout);
 
