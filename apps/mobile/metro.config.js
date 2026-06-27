@@ -1,5 +1,8 @@
 const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
 
+// NativeWind v2: no withNativeWind wrapper needed.
+// The babel plugin handles className → StyleSheet transforms at compile time.
+// expo/metro-config already handles CSS for web via its own transformer.
 const config = getDefaultConfig(__dirname);
-module.exports = withNativeWind(config, { input: './src/styles/global.css' });
+
+module.exports = config;

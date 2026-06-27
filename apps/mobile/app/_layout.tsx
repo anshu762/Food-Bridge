@@ -5,6 +5,8 @@ import { View, Text } from 'react-native';
 import { AppProvider } from '../src/providers/AppProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { useNetworkStatus } from '../src/hooks/useNetworkStatus';
+// NativeWind v2: global.css is needed for web CSS processing only.
+// On native, className → style is handled by the babel plugin at compile time.
 import '../src/styles/global.css';
 
 function RootNavigation() {
