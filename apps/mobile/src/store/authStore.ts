@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
-import { router } from 'expo-router';
 
 // Make sure these match the shared types from backend
 export type Role = 'DONOR' | 'RECEIVER' | 'ADMIN';
@@ -11,6 +10,11 @@ export type Role = 'DONOR' | 'RECEIVER' | 'ADMIN';
  * expo-secure-store is native-only (Android/iOS).
  * On web, we fall back to localStorage which is acceptable for local dev/testing.
  * In production, the app runs on native so SecureStore is always used.
+ *
+ * NOTE: We do NOT import `router` from expo-router here.
+ * Calling router.replace() from a Zustand store (outside NavigationContainer)
+ * causes "Couldn't find a navigation context" errors.
+ * Instead, _layout.tsx watches `user` state and handles all routing reactively.
  */
 const storage = {
   get: async (key: string): Promise<string | null> => {
@@ -46,7 +50,9 @@ interface AuthState {
   user: User | null;
   accessToken: string | null;
   isHydrated: boolean;
+  // login sets state only — _layout.tsx useEffect handles the actual navigation
   login: (user: User, accessToken: string, refreshToken: string) => Promise<void>;
+  // logout clears state only — _layout.tsx useEffect navigates to login
   logout: () => Promise<void>;
   updateToken: (accessToken: string) => void;
   hydrate: () => Promise<void>;
@@ -63,12 +69,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       storage.set('accessToken', accessToken),
       storage.set('refreshToken', refreshToken),
     ]);
+    // Only update state. Navigation is handled reactively by _layout.tsx
     set({ user, accessToken, isHydrated: true });
-
-    // Route based on role after successful login
-    if (user.role === 'DONOR') router.replace('/(donor)');
-    else if (user.role === 'RECEIVER') router.replace('/(receiver)');
-    else if (user.role === 'ADMIN') router.replace('/(admin)');
   },
 
   logout: async () => {
@@ -77,8 +79,8 @@ export const useAuthStore = create<AuthState>((set) => ({
       storage.del('accessToken'),
       storage.del('refreshToken'),
     ]);
+    // Only update state. Navigation is handled reactively by _layout.tsx
     set({ user: null, accessToken: null });
-    router.replace('/(auth)/login');
   },
 
   updateToken: (accessToken: string) => {

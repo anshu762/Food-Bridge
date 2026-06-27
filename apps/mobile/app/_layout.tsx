@@ -20,11 +20,11 @@ function RootNavigation() {
     const inReceiverGroup = segments[0] === '(receiver)';
     const inAdminGroup = segments[0] === '(admin)';
 
-    if (!user && !inAuthGroup && segments.length > 0) {
-      // Not logged in, redirect to auth (unless on splash '')
+    if (!user && !inAuthGroup) {
+      // Not logged in → always go to login (covers logout and direct URL access)
       router.replace('/(auth)/login');
     } else if (user) {
-      // Logged in, enforce role-based routing if they are in the wrong group
+      // Logged in: enforce role-based routing if in the wrong group
       if (user.role === 'DONOR' && !inDonorGroup) {
         router.replace('/(donor)');
       } else if (user.role === 'RECEIVER' && !inReceiverGroup) {
