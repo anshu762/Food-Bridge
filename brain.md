@@ -38,3 +38,13 @@ The project is a monorepo (pnpm workspaces) for a food donation matching platfor
 - **Verification:** Postman collection created at the root (`food-bridge-phase1.postman_collection.json`).
 
 _(Add new phases below as they are completed...)_
+
+### Phase 2: Backend Business Logic (Completed)
+
+- **Database Schema Updates:** Added `pickupLat`, `pickupLng`, `foodType`, `safeUntil` to `FoodListing` and `expoPushToken` to `User`. Added `COLLECTED` to `ListingStatus`.
+- **Listings Module:** Implemented `GET` (with Haversine geo-distance filtering and pagination), `POST`, `PATCH`, and `DELETE` (soft-cancel). Added Cloudinary signature endpoint for image uploads.
+- **Requests Module (Critical):** Implemented transaction logic using `$queryRaw` `SELECT ... FOR UPDATE` to strictly prevent concurrent approval races. Added approve, reject, cancel, and collect lifecycle endpoints.
+- **Notifications Module:** Integrated Expo server SDK for push notifications on listing updates, request approvals, and cron jobs.
+- **Cron Jobs:** Added `node-cron` job running every 5 minutes to expire listings safely and notify users of overdue pickups.
+- **Impact & Verification:** Implemented aggregated views (`GET /impact/me`, `GET /impact/platform`) and ID verification document upload and approval endpoints.
+- **Zod & Types:** Fully exported schemas across the monorepo. Typechecked and verified.

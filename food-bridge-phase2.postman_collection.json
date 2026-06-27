@@ -1,0 +1,135 @@
+{
+  "info": {
+    "_postman_id": "c2c2c2c2-c2c2-c2c2-c2c2-c2c2c2c2c2c2",
+    "name": "Food Bridge - Phase 2",
+    "description": "Backend Business Logic endpoints for Food Bridge Phase 2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Listings",
+      "item": [
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{donorToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Fresh Apples\",\n  \"foodType\": \"Produce\",\n  \"quantity\": 10,\n  \"unit\": \"KG\",\n  \"pickupLat\": 37.7749,\n  \"pickupLng\": -122.4194,\n  \"pickupAddress\": \"123 Apple St\",\n  \"photos\": [\"https://res.cloudinary.com/test/image/upload/v123/apples.jpg\"],\n  \"preparedAt\": \"2023-10-01T10:00:00Z\",\n  \"safeUntil\": \"2030-10-01T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/listings",
+              "host": ["{{baseUrl}}"],
+              "path": ["listings"]
+            }
+          }
+        },
+        {
+          "name": "Get Listings (Haversine Filter)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{receiverToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/listings?lat=37.77&lng=-122.41&radiusKm=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["listings"],
+              "query": [
+                { "key": "lat", "value": "37.77" },
+                { "key": "lng", "value": "-122.41" },
+                { "key": "radiusKm", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Edit Listing",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{donorToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Apples\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/listings/{{listingId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["listings", "{{listingId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Requests",
+      "item": [
+        {
+          "name": "Create Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{receiverToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"listingId\": \"{{listingId}}\",\n  \"message\": \"I can pick this up today.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/requests",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests"]
+            }
+          }
+        },
+        {
+          "name": "Approve Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{donorToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/requests/{{requestId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests", "{{requestId}}", "approve"]
+            }
+          }
+        },
+        {
+          "name": "Collect Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{receiverToken}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/requests/{{requestId}}/collect",
+              "host": ["{{baseUrl}}"],
+              "path": ["requests", "{{requestId}}", "collect"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3001", "type": "string" },
+    { "key": "donorToken", "value": "YOUR_DONOR_TOKEN", "type": "string" },
+    {
+      "key": "receiverToken",
+      "value": "YOUR_RECEIVER_TOKEN",
+      "type": "string"
+    },
+    { "key": "listingId", "value": "YOUR_LISTING_ID", "type": "string" },
+    { "key": "requestId", "value": "YOUR_REQUEST_ID", "type": "string" }
+  ]
+}
