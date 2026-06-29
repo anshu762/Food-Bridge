@@ -20,14 +20,14 @@ function RootNavigation() {
     const inAdminGroup = segments[0] === '(admin)';
 
     if (!user && !inAuthGroup) {
-      router.replace('/(auth)/login');
+      (router as any).replace('/(auth)/login');
     } else if (user) {
       if (user.role === 'DONOR' && !inDonorGroup) {
-        router.replace('/(donor)');
+        (router as any).replace('/(donor)');
       } else if (user.role === 'RECEIVER' && !inReceiverGroup) {
-        router.replace('/(receiver)');
+        (router as any).replace('/(receiver)');
       } else if (user.role === 'ADMIN' && !inAdminGroup) {
-        router.replace('/(admin)');
+        (router as any).replace('/(admin)');
       }
     }
   }, [user, isHydrated, segments]);

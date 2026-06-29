@@ -1,37 +1,17 @@
-import { Tabs } from 'expo-router';
-import { Home, Search, PackageOpen, User } from 'lucide-react-native';
+import { Stack } from 'expo-router';
 
 export default function ReceiverLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: '#5f8f2a', headerShown: false }}>
-      <Tabs.Screen
-        name="index"
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="listing/[id]"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <Home color={color} />,
+          title: 'Listing Details',
+          headerShown: true,
+          headerTintColor: '#3B6D11',
         }}
       />
-      <Tabs.Screen
-        name="browse"
-        options={{
-          title: 'Browse',
-          tabBarIcon: ({ color }) => <Search color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="my-requests"
-        options={{
-          title: 'My Requests',
-          tabBarIcon: ({ color }) => <PackageOpen color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Profile',
-          tabBarIcon: ({ color }) => <User color={color} />,
-        }}
-      />
-    </Tabs>
+    </Stack>
   );
 }
