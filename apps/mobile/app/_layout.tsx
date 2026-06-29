@@ -5,9 +5,6 @@ import { View, Text } from 'react-native';
 import { AppProvider } from '../src/providers/AppProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { useNetworkStatus } from '../src/hooks/useNetworkStatus';
-// NativeWind v2: global.css is needed for web CSS processing only.
-// On native, className → style is handled by the babel plugin at compile time.
-import '../src/styles/global.css';
 
 function RootNavigation() {
   const { isHydrated, user } = useAuthStore();
@@ -23,10 +20,8 @@ function RootNavigation() {
     const inAdminGroup = segments[0] === '(admin)';
 
     if (!user && !inAuthGroup) {
-      // Not logged in → always go to login (covers logout and direct URL access)
       router.replace('/(auth)/login');
     } else if (user) {
-      // Logged in: enforce role-based routing if in the wrong group
       if (user.role === 'DONOR' && !inDonorGroup) {
         router.replace('/(donor)');
       } else if (user.role === 'RECEIVER' && !inReceiverGroup) {
@@ -38,7 +33,7 @@ function RootNavigation() {
   }, [user, isHydrated, segments]);
 
   if (!isHydrated) {
-    return null; // Or a splash screen
+    return null;
   }
 
   return (

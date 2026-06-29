@@ -173,6 +173,11 @@ export const getListingDetails = async (req: Request, res: Response, next: NextF
         donor: {
           select: { id: true, name: true, orgName: true, email: true, phone: true },
         },
+        requests: {
+          include: {
+            receiver: { select: { id: true, name: true, email: true, phone: true } },
+          },
+        },
       },
     });
 

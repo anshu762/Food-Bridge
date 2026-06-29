@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text } from 'react-native';
-import { cn } from '../../utils/cn';
+import { View, Text, ViewStyle } from 'react-native';
+import tw from '../../utils/tw';
 
 type BadgeStatus =
   | 'AVAILABLE'
@@ -13,47 +13,27 @@ type BadgeStatus =
 
 interface BadgeProps {
   status: BadgeStatus | string;
-  className?: string;
+  style?: ViewStyle;
 }
 
-export const Badge = ({ status, className }: BadgeProps) => {
-  const getBadgeStyle = (s: string) => {
-    switch (s) {
-      case 'AVAILABLE':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'RESERVED':
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'COLLECTED':
-      case 'ACCEPTED':
-        return 'bg-primary-100 text-primary-800 border-primary-200';
-      case 'CANCELLED':
-      case 'REJECTED':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+const badgeStyles: Record<string, { bg: string; text: string; border: string }> = {
+  AVAILABLE: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
+  RESERVED: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
+  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
+  COLLECTED: { bg: 'bg-primary-100', text: 'text-primary-800', border: 'border-primary-200' },
+  ACCEPTED: { bg: 'bg-primary-100', text: 'text-primary-800', border: 'border-primary-200' },
+  CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
+  REJECTED: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
+};
 
-  const styleClass = getBadgeStyle(status);
+const defaultStyle = { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-200' };
+
+export const Badge = ({ status, style: extraStyle }: BadgeProps) => {
+  const s = badgeStyles[status] || defaultStyle;
 
   return (
-    <View
-      className={cn(
-        'px-2.5 py-1 rounded-full border self-start',
-        styleClass.split(' text-')[0],
-        styleClass.split(' ').find((c) => c.startsWith('border-')),
-        className,
-      )}
-    >
-      <Text
-        className={cn(
-          'text-xs font-semibold',
-          styleClass.split(' ').find((c) => c.startsWith('text-')),
-        )}
-      >
-        {status}
-      </Text>
+    <View style={[tw`px-2.5 py-1 rounded-full border self-start ${s.bg} ${s.border}`, extraStyle]}>
+      <Text style={tw`text-xs font-semibold ${s.text}`}>{status}</Text>
     </View>
   );
 };

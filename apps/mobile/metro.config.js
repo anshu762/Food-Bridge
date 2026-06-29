@@ -1,6 +1,7 @@
 const { getDefaultConfig } = require('expo/metro-config');
-const { withNativeWind } = require('nativewind/metro');
 
+// Plain metro config — no NativeWind/css-interop wrappers.
+// Styling is handled by twrnc (pure JS, no runtime hooks).
 const config = getDefaultConfig(__dirname);
 
-module.exports = withNativeWind(config, { input: './src/styles/global.css' });
+module.exports = config;

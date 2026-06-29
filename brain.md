@@ -56,3 +56,11 @@ _(Add new phases below as they are completed...)_
 - **API & Networking:** Configured a resilient Axios client with a 401 response interceptor. It gracefully handles queueing concurrent requests, attempting a single background refresh, and cleanly re-executing queued requests without logging the user out. Integrated `@react-native-community/netinfo` to provide global offline mode banners.
 - **Navigation Shell:** Built Expo Router groups and Tab layouts for `(auth)`, `(donor)`, `(receiver)`, and `(admin)`. Implemented global hydration redirects to enforce strict role-based navigation.
 - **Auth Flow:** Built full E2E UI screens for Onboarding (persisted check), Login, dynamic Role-based Registration, and Password Recovery, strictly mapping to the backend Phase 1 endpoints with comprehensive validation.
+
+### Phase 4: Mobile Core Workflows - Donor Flows (Completed)
+
+- **State Management & API:** Configured comprehensive API clients and React Query hooks (`useListings`, `useRequests`, `useImpact`) for the donor features. Added a Zustand store (`useDraftStore`) for persisting multi-step form data locally.
+- **Create Listing Flow:** Built a robust, resilient 5-step form. Integrated `expo-image-manipulator` for client-side image compression and direct Cloudinary uploads with retry mechanisms. Added `expo-location` and `react-native-maps` for GPS pickup pin-drops.
+- **My Listings:** Implemented a scalable, segmented listing view with `FlatList` and infinite scrolling. Includes real-time relative expiry badges (e.g., "Expires in 2h").
+- **Listing Detail & Race Conditions:** Built the donor view to manage incoming `FoodRequest`s. Explicitly handles 409 Conflict race conditions when approving requests, immediately invalidating and refetching to ensure the UI represents the strict backend transactional state.
+- **Donor Dashboard:** Completed the donor home screen displaying dynamic impact metrics (`GET /impact/me`) and quick links to pending requests needing a decision.

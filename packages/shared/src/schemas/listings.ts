@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const createListingSchema = z.object({
-  title: z.string().min(3),
+  title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
   foodType: z.string().min(1),
   quantity: z.number().positive(),

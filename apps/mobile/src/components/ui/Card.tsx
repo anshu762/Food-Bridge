@@ -1,11 +1,11 @@
 import React from 'react';
 import { View, ViewProps, TouchableOpacity, TouchableOpacityProps } from 'react-native';
-import { cn } from '../../utils/cn';
+import tw from '../../utils/tw';
 
-export const Card = ({ className, children, ...props }: ViewProps) => {
+export const Card = ({ style, children, ...props }: ViewProps) => {
   return (
     <View
-      className={cn('bg-white rounded-2xl p-4 shadow-sm border border-gray-100', className)}
+      style={[tw`bg-white rounded-2xl p-4 border border-gray-100`, style]}
       {...props}
     >
       {children}
@@ -13,11 +13,11 @@ export const Card = ({ className, children, ...props }: ViewProps) => {
   );
 };
 
-export const TouchableCard = ({ className, children, ...props }: TouchableOpacityProps) => {
+export const TouchableCard = ({ style, children, ...props }: TouchableOpacityProps) => {
   return (
     <TouchableOpacity
       activeOpacity={0.7}
-      className={cn('bg-white rounded-2xl p-4 shadow-sm border border-gray-100', className)}
+      style={[tw`bg-white rounded-2xl p-4 border border-gray-100`, style]}
       {...props}
     >
       {children}
