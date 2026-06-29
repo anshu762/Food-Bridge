@@ -7,6 +7,7 @@ import { Button } from '../ui/Button';
 import tw from '../../utils/tw';
 
 const step1Schema = z.object({
+  title: z.string().min(1, 'Title is required'),
   foodType: z.string().min(1, 'Food type is required'),
   description: z.string().optional(),
   quantity: z.coerce.number().min(1, 'Quantity must be greater than 0'),
@@ -24,6 +25,7 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
   const { control, handleSubmit, formState: { errors } } = useForm<Step1FormData>({
     resolver: zodResolver(step1Schema),
     defaultValues: {
+      title: initialData.title || '',
       foodType: initialData.foodType || '',
       description: initialData.description || '',
       quantity: initialData.quantity as any || '',
@@ -37,6 +39,20 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
         <Text style={tw`text-lg font-bold text-gray-900 mb-4`}>What are you donating?</Text>
       </View>
       
+      <Controller
+        control={control}
+        name="title"
+        render={({ field: { onChange, value } }) => (
+          <Input
+            label="Listing Title"
+            placeholder="e.g., Freshly Baked Bread Loaves"
+            value={value}
+            onChangeText={onChange}
+            error={errors.title?.message}
+          />
+        )}
+      />
+
       <Controller
         control={control}
         name="foodType"

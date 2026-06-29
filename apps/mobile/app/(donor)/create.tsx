@@ -38,6 +38,7 @@ export default function CreateListing() {
       setSubmitError(null);
       
       const payload = {
+        title: draft.title!,
         foodType: draft.foodType!,
         description: draft.description || undefined,
         quantity: Number(draft.quantity!),

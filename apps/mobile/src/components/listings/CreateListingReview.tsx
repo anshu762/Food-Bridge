@@ -28,7 +28,8 @@ export function CreateListingReview({ data, onSubmit, onBack, isSubmitting, erro
         <View style={tw`space-y-4`}>
           <View>
             <Text style={tw`text-xs text-gray-500 uppercase tracking-wider`}>Food Details</Text>
-            <Text style={tw`text-base font-medium text-gray-900`}>{data.foodType}</Text>
+            <Text style={tw`text-lg font-bold text-gray-900 mt-1`}>{data.title}</Text>
+            <Text style={tw`text-base font-medium text-gray-700 mt-1`}>{data.foodType}</Text>
             {data.description ? (
               <Text style={tw`text-sm text-gray-700 mt-1`}>{data.description}</Text>
             ) : null}

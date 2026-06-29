@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export interface DraftListing {
+  title: string;
   foodType: string;
   description: string;
   quantity: number;
