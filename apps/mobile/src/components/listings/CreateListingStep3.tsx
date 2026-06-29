@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, ScrollView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Button } from '../ui/Button';
@@ -58,23 +58,29 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
       setPhotos(prev => prev.map(p => p.uri === photo.uri ? { ...p, status: 'uploading' } : p));
 
       // 2. Get signature
-      const { signature, timestamp, apiKey, cloudName } = await uploadSignatureMutation.mutateAsync();
+      const { signature, timestamp, apiKey, cloudName, folder } = await uploadSignatureMutation.mutateAsync();
 
-      // 3. Upload to Cloudinary
       const formData = new FormData();
-      formData.append('file', {
-        uri: manipResult.uri,
-        type: 'image/jpeg',
-        name: 'upload.jpg',
-      } as any);
-      formData.append('api_key', apiKey);
-      formData.append('timestamp', timestamp);
-      formData.append('signature', signature);
+      if (Platform.OS === 'web') {
+        const res = await fetch(manipResult.uri);
+        const blob = await res.blob();
+        formData.append('file', blob, 'upload.jpg');
+      } else {
+        formData.append('file', {
+          uri: manipResult.uri,
+          type: 'image/jpeg',
+          name: 'upload.jpg',
+        } as any);
+      }
+      formData.append('api_key', String(apiKey));
+      formData.append('timestamp', String(timestamp));
+      formData.append('signature', String(signature));
+      if (folder) formData.append('folder', String(folder));
 
+      // Do NOT set Content-Type manually, the browser/fetch needs to set the multipart boundary automatically
       const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
         method: 'POST',
         body: formData,
-        headers: { 'Content-Type': 'multipart/form-data' }
       });
       
       const data = await response.json();
