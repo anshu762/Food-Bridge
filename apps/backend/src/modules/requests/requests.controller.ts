@@ -17,7 +17,7 @@ export const createRequest = async (req: Request, res: Response, next: NextFunct
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const listings = await tx.$queryRaw<
         any[]
-      >`SELECT * FROM "FoodListing" WHERE id = ${listingId}::uuid FOR UPDATE`;
+      >`SELECT * FROM "FoodListing" WHERE id = ${listingId} FOR UPDATE`;
 
       if (!listings || listings.length === 0) {
         throw new AppError('Listing not found', StatusCodes.NOT_FOUND);
@@ -84,7 +84,7 @@ export const approveRequest = async (req: Request, res: Response, next: NextFunc
     const { id } = req.params;
     const donorId = req.user!.id;
 
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       // Get the request to find the listingId
       const targetRequest = await tx.foodRequest.findUnique({ where: { id } });
       if (!targetRequest) throw new AppError('Request not found', StatusCodes.NOT_FOUND);
@@ -97,7 +97,7 @@ export const approveRequest = async (req: Request, res: Response, next: NextFunc
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const listings = await tx.$queryRaw<
         any[]
-      >`SELECT * FROM "FoodListing" WHERE id = ${listingId}::uuid FOR UPDATE`;
+      >`SELECT * FROM "FoodListing" WHERE id = ${listingId} FOR UPDATE`;
       if (!listings || listings.length === 0)
         throw new AppError('Listing not found', StatusCodes.NOT_FOUND);
       const listing = listings[0];
@@ -131,27 +131,38 @@ export const approveRequest = async (req: Request, res: Response, next: NextFunc
           data: { status: 'REJECTED' },
         });
 
-        // Notify rejected receivers
-        for (const r of otherRequests) {
-          await createNotification(
-            r.receiverId,
-            'REQUEST_REJECTED',
-            'Request Not Approved',
-            `Your request for ${listing.title} was not approved as the listing is no longer available.`,
-            { listingId },
-          );
-        }
+        // We will notify them outside the transaction
       }
 
-      // 5. Notify the approved receiver
-      await createNotification(
-        targetRequest.receiverId,
-        'REQUEST_APPROVED',
-        'Request Approved!',
-        `Your request for ${listing.title} has been approved! Pickup details are now unlocked.`,
-        { listingId },
-      );
+      return {
+        listingTitle: listing.title,
+        targetReceiverId: targetRequest.receiverId,
+        otherReceivers: otherRequests.map(r => r.receiverId),
+        listingId
+      };
     });
+
+    // Notify rejected receivers
+    if (result.otherReceivers.length > 0) {
+      for (const receiverId of result.otherReceivers) {
+        await createNotification(
+          receiverId,
+          'REQUEST_REJECTED',
+          'Request Not Approved',
+          `Your request for ${result.listingTitle} was not approved as the listing is no longer available.`,
+          { listingId: result.listingId },
+        );
+      }
+    }
+
+    // 5. Notify the approved receiver
+    await createNotification(
+      result.targetReceiverId,
+      'REQUEST_APPROVED',
+      'Request Approved!',
+      `Your request for ${result.listingTitle} has been approved! Pickup details are now unlocked.`,
+      { listingId: result.listingId },
+    );
 
     res.status(StatusCodes.OK).json({ success: true, message: 'Request approved' });
   } catch (error) {
@@ -163,7 +174,7 @@ export const rejectRequest = async (req: Request, res: Response, next: NextFunct
   try {
     const { id } = req.params;
 
-    await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx) => {
       const targetRequest = await tx.foodRequest.findUnique({
         where: { id },
         include: { listing: true },
@@ -180,14 +191,20 @@ export const rejectRequest = async (req: Request, res: Response, next: NextFunct
         data: { status: 'REJECTED' },
       });
 
-      await createNotification(
-        targetRequest.receiverId,
-        'REQUEST_REJECTED',
-        'Request Rejected',
-        `Your request for ${targetRequest.listing.title} was rejected by the donor.`,
-        { listingId: targetRequest.listing.id },
-      );
+      return {
+        receiverId: targetRequest.receiverId,
+        listingTitle: targetRequest.listing.title,
+        listingId: targetRequest.listing.id
+      };
     });
+
+    await createNotification(
+      result.receiverId,
+      'REQUEST_REJECTED',
+      'Request Rejected',
+      `Your request for ${result.listingTitle} was rejected by the donor.`,
+      { listingId: result.listingId },
+    );
 
     res.status(StatusCodes.OK).json({ success: true, message: 'Request rejected' });
   } catch (error) {

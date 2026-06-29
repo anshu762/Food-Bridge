@@ -53,9 +53,10 @@ export const errorHandler = (
         error: 'Record not found',
       });
     }
+    console.error('PRISMA ERROR:', err);
     return res.status(StatusCodes.BAD_REQUEST).json({
       success: false,
-      error: 'Database Error',
+      error: `Database Error: ${err.message}`,
     });
   }
 
