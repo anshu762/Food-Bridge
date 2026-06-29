@@ -129,7 +129,8 @@ export default function ListingDetail() {
   }
 
   const isAvailable = listing.status === 'AVAILABLE';
-  const hasApprovedRequest = listing.requests.some((req: any) => req.status === 'APPROVED' || req.status === 'COLLECTED');
+  const requests = listing.requests || [];
+  const hasApprovedRequest = requests.some((req: any) => req.status === 'APPROVED' || req.status === 'COLLECTED');
 
   return (
     <View style={tw`flex-1 bg-gray-50`}>
@@ -196,13 +197,13 @@ export default function ListingDetail() {
         </View>
 
         <View style={tw`bg-white px-4 py-4 mb-8 border-y border-gray-100`}>
-          <Text style={tw`text-lg font-bold text-gray-900 mb-4`}>Requests ({listing.requests.length})</Text>
+          <Text style={tw`text-lg font-bold text-gray-900 mb-4`}>Requests ({requests.length})</Text>
           
-          {listing.requests.length === 0 ? (
+          {requests.length === 0 ? (
             <Text style={tw`text-gray-500 italic text-center py-4`}>No requests yet.</Text>
           ) : (
             <View style={tw`space-y-4`}>
-              {listing.requests.map((req: any) => {
+              {requests.map((req: any) => {
                 const isPending = req.status === 'PENDING';
                 const showDisabled = isPending && hasApprovedRequest;
                 
