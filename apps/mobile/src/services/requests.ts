@@ -4,7 +4,7 @@ export interface FoodRequest {
   id: string;
   listingId: string;
   receiverId: string;
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'CANCELLED' | 'COLLECTED';
+  status: 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'CANCELLED' | 'COLLECTED';
   message: string | null;
   createdAt: string;
   updatedAt: string;
@@ -22,22 +22,22 @@ export const requestsService = {
   },
   
   approveRequest: async (requestId: string) => {
-    const { data } = await api.post(`/requests/${requestId}/approve`);
+    const { data } = await api.patch(`/requests/${requestId}/approve`);
     return data.data;
   },
   
   rejectRequest: async (requestId: string) => {
-    const { data } = await api.post(`/requests/${requestId}/reject`);
+    const { data } = await api.patch(`/requests/${requestId}/reject`);
     return data.data;
   },
   
   collectRequest: async (requestId: string) => {
-    const { data } = await api.post(`/requests/${requestId}/collect`);
+    const { data } = await api.patch(`/requests/${requestId}/collect`);
     return data.data;
   },
   
   cancelRequest: async (requestId: string) => {
-    const { data } = await api.post(`/requests/${requestId}/cancel`);
+    const { data } = await api.patch(`/requests/${requestId}/cancel`);
     return data.data;
   }
 };

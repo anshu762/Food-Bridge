@@ -130,7 +130,7 @@ export default function ListingDetail() {
 
   const isAvailable = listing.status === 'AVAILABLE';
   const requests = listing.requests || [];
-  const hasApprovedRequest = requests.some((req: any) => req.status === 'APPROVED' || req.status === 'COLLECTED');
+  const hasApprovedRequest = requests.some((req: any) => req.status === 'ACCEPTED' || req.status === 'COLLECTED');
 
   return (
     <View style={tw`flex-1 bg-gray-50`}>
