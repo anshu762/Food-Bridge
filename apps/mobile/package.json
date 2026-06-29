@@ -45,7 +45,7 @@
     "tailwindcss": "^3.4.19",
     "twrnc": "^4.16.0",
     "zod": "^3.25.76",
-    "zustand": "^5.0.14"
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.25.0",
