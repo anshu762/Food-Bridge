@@ -3,6 +3,7 @@ import { View, Text, Platform, TouchableOpacity } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { Button } from '../ui/Button';
+import tw from '../../utils/tw';
 
 interface Step2FormData {
   preparedAt: string;
@@ -49,16 +50,16 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
   };
 
   return (
-    <View className="flex-1 space-y-6">
-      <Text className="text-lg font-bold text-gray-900 mb-2">When was this prepared?</Text>
+    <View style={tw`flex-1 space-y-6`}>
+      <Text style={tw`text-lg font-bold text-gray-900 mb-2`}>When was this prepared?</Text>
 
-      {error ? <Text className="text-red-500 font-medium mb-4">{error}</Text> : null}
+      {error ? <Text style={tw`text-red-500 font-medium mb-4`}>{error}</Text> : null}
 
-      <View className="space-y-2">
-        <Text className="text-sm font-medium text-gray-700">Prepared At</Text>
+      <View style={tw`space-y-2`}>
+        <Text style={tw`text-sm font-medium text-gray-700`}>Prepared At</Text>
         <TouchableOpacity
           onPress={() => setShowPreparedPicker(true)}
-          className="border border-gray-300 rounded-lg p-3 bg-gray-50"
+          style={tw`border border-gray-300 rounded-lg p-3 bg-gray-50`}
         >
           <Text>{format(preparedAt, 'PPp')}</Text>
         </TouchableOpacity>
@@ -76,11 +77,11 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
         )}
       </View>
 
-      <View className="space-y-2">
-        <Text className="text-sm font-medium text-gray-700">Safe Until</Text>
+      <View style={tw`space-y-2`}>
+        <Text style={tw`text-sm font-medium text-gray-700`}>Safe Until</Text>
         <TouchableOpacity
           onPress={() => setShowSafePicker(true)}
-          className="border border-gray-300 rounded-lg p-3 bg-gray-50"
+          style={tw`border border-gray-300 rounded-lg p-3 bg-gray-50`}
         >
           <Text>{format(safeUntil, 'PPp')}</Text>
         </TouchableOpacity>
@@ -98,11 +99,11 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
         )}
       </View>
 
-      <View className="flex-row space-x-4 mt-8">
-        <View className="flex-1">
+      <View style={tw`flex-row space-x-4 mt-8`}>
+        <View style={tw`flex-1`}>
           <Button variant="ghost" onPress={onBack}>Back</Button>
         </View>
-        <View className="flex-1">
+        <View style={tw`flex-1`}>
           <Button onPress={handleNext}>Next</Button>
         </View>
       </View>

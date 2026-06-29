@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TextInputProps, TouchableOpacity } from 'react-native';
 import { Eye, EyeOff } from 'lucide-react-native';
-import { cn } from '../../utils/cn';
+import tw from '../../utils/tw';
 import { useController, UseControllerProps } from 'react-hook-form';
 
 interface InputProps extends TextInputProps {
@@ -13,30 +13,30 @@ interface InputProps extends TextInputProps {
 
 export const Input = React.forwardRef<TextInput, InputProps>(
   (
-    { label, helperText, error, secureTextEntryToggle, secureTextEntry, className, ...props },
+    { label, helperText, error, secureTextEntryToggle, secureTextEntry, style, ...props },
     ref,
   ) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const isSecure = secureTextEntry && !isPasswordVisible;
 
     return (
-      <View className="mb-4 w-full">
-        {label && <Text className="mb-1 text-sm font-medium text-gray-700">{label}</Text>}
-        <View className="relative justify-center">
+      <View style={tw`mb-4 w-full`}>
+        {label && <Text style={tw`mb-1 text-sm font-medium text-gray-700`}>{label}</Text>}
+        <View style={tw`relative justify-center`}>
           <TextInput
             ref={ref}
-            className={cn(
-              'w-full rounded-xl border bg-gray-50 px-4 py-3 text-base text-gray-900',
-              error ? 'border-red-500' : 'border-gray-200 focus:border-primary-500',
-              className,
-            )}
+            style={[
+              tw`w-full rounded-xl border bg-gray-50 px-4 py-3 text-base text-gray-900`,
+              error ? tw`border-red-500` : tw`border-gray-200`,
+              style,
+            ]}
             secureTextEntry={isSecure}
             placeholderTextColor="#9CA3AF"
             {...props}
           />
           {secureTextEntryToggle && (
             <TouchableOpacity
-              className="absolute right-4"
+              style={tw`absolute right-4`}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
               {isPasswordVisible ? (
@@ -48,9 +48,9 @@ export const Input = React.forwardRef<TextInput, InputProps>(
           )}
         </View>
         {error ? (
-          <Text className="mt-1 text-sm text-red-500">{error}</Text>
+          <Text style={tw`mt-1 text-sm text-red-500`}>{error}</Text>
         ) : helperText ? (
-          <Text className="mt-1 text-sm text-gray-500">{helperText}</Text>
+          <Text style={tw`mt-1 text-sm text-gray-500`}>{helperText}</Text>
         ) : null}
       </View>
     );

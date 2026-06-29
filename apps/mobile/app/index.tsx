@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from '../src/components/ui/Button';
 import { useAuthStore } from '../src/store/authStore';
+import tw from '../src/utils/tw';
 
 const { width } = Dimensions.get('window');
 
@@ -48,7 +49,7 @@ export default function Onboarding() {
     }
   }, [isHydrated, user]);
 
-  if (checking) return null; // Wait until we know where to route
+  if (checking) return null;
 
   const handleScroll = (event: any) => {
     const slide = Math.round(event.nativeEvent.contentOffset.x / width);
@@ -66,38 +67,39 @@ export default function Onboarding() {
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <View style={tw`flex-1 bg-white`}>
       <ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={handleScroll}
-        className="flex-1"
+        style={tw`flex-1`}
       >
         {slides.map((slide, index) => (
-          <View key={index} style={{ width }} className="flex-1 items-center justify-center px-6">
-            <View className="w-full aspect-square bg-primary-50 rounded-full mb-8 items-center justify-center">
-              <Text className="text-primary-600 text-6xl font-bold">FB</Text>
+          <View key={index} style={[{ width }, tw`flex-1 items-center justify-center px-6`]}>
+            <View style={tw`w-full aspect-square bg-primary-50 rounded-full mb-8 items-center justify-center`}>
+              <Text style={tw`text-primary-600 text-6xl font-bold`}>FB</Text>
             </View>
-            <Text className="text-3xl font-bold text-gray-900 text-center mb-4">{slide.title}</Text>
-            <Text className="text-lg text-gray-500 text-center">{slide.subtitle}</Text>
+            <Text style={tw`text-3xl font-bold text-gray-900 text-center mb-4`}>{slide.title}</Text>
+            <Text style={tw`text-lg text-gray-500 text-center`}>{slide.subtitle}</Text>
           </View>
         ))}
       </ScrollView>
 
-      <View className="px-6 pb-12 pt-4">
-        <View className="flex-row justify-center mb-8">
+      <View style={tw`px-6 pb-12 pt-4`}>
+        <View style={tw`flex-row justify-center mb-8`}>
           {slides.map((_, index) => (
             <View
               key={index}
-              className={`h-2 rounded-full mx-1 ${
-                currentSlide === index ? 'w-8 bg-primary-600' : 'w-2 bg-gray-200'
-              }`}
+              style={[
+                tw`h-2 rounded-full mx-1`,
+                currentSlide === index ? tw`w-8 bg-primary-600` : tw`w-2 bg-gray-200`,
+              ]}
             />
           ))}
         </View>
 
-        <Button variant="primary" fullWidth className="mb-4" onPress={completeOnboardingRegister}>
+        <Button variant="primary" fullWidth style={tw`mb-4`} onPress={completeOnboardingRegister}>
           Get Started (Register)
         </Button>
         <Button variant="ghost" fullWidth onPress={completeOnboarding}>

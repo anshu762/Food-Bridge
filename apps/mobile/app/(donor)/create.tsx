@@ -9,6 +9,7 @@ import { CreateListingStep3 } from '../../src/components/listings/CreateListingS
 import { CreateListingStep4 } from '../../src/components/listings/CreateListingStep4';
 import { CreateListingReview } from '../../src/components/listings/CreateListingReview';
 import { ChevronLeft } from 'lucide-react-native';
+import tw from '../../src/utils/tw';
 
 const TOTAL_STEPS = 5;
 
@@ -81,25 +82,24 @@ export default function CreateListing() {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
-      className="flex-1 bg-white"
+      style={tw`flex-1 bg-white`}
     >
-      <View className="px-4 py-4 flex-row items-center border-b border-gray-100">
-        <TouchableOpacity onPress={handleBack} className="p-2 -ml-2">
+      <View style={tw`px-4 py-4 flex-row items-center border-b border-gray-100`}>
+        <TouchableOpacity onPress={handleBack} style={tw`p-2 -ml-2`}>
           <ChevronLeft color="#374151" size={24} />
         </TouchableOpacity>
-        <Text className="text-lg font-bold text-gray-900 ml-2">Create Listing</Text>
-        <View className="flex-1" />
-        <Text className="text-sm font-medium text-gray-500">Step {step} of {TOTAL_STEPS}</Text>
+        <Text style={tw`text-lg font-bold text-gray-900 ml-2`}>Create Listing</Text>
+        <View style={tw`flex-1`} />
+        <Text style={tw`text-sm font-medium text-gray-500`}>Step {step} of {TOTAL_STEPS}</Text>
       </View>
 
-      <View className="h-1 bg-gray-100 w-full">
+      <View style={tw`h-1 bg-gray-100 w-full`}>
         <View 
-          className="h-full bg-primary-600" 
-          style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} 
+          style={[tw`h-full bg-primary-600`, { width: `${(step / TOTAL_STEPS) * 100}%` }]} 
         />
       </View>
 
-      <View className="flex-1 p-6">
+      <View style={tw`flex-1 p-6`}>
         {step === 1 && <CreateListingStep1 initialData={draft as any} onNext={handleNext} />}
         {step === 2 && <CreateListingStep2 initialData={draft} onNext={handleNext} onBack={handleBack} />}
         {step === 3 && <CreateListingStep3 initialData={draft} onNext={handleNext} onBack={handleBack} />}

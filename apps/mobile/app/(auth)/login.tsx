@@ -11,6 +11,7 @@ import { api } from '../../src/services/api';
 import { useToast } from '../../src/components/ui/Toast';
 import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
 import { z } from 'zod';
+import tw from '../../src/utils/tw';
 
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -40,7 +41,6 @@ export default function LoginScreen() {
 
       const { user, accessToken, refreshToken } = res.data.data;
       await login(user, accessToken, refreshToken);
-      // Navigation is handled by the authStore
     } catch (error: any) {
       showToast({
         message: error.response?.data?.error || 'Invalid email or password. Please try again.',
@@ -54,12 +54,12 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-white"
+      style={tw`flex-1 bg-white`}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
-        <View className="mb-8 items-center">
-          <Text className="text-3xl font-bold text-primary-600 mb-2">Welcome Back</Text>
-          <Text className="text-gray-500 text-center text-base">
+        <View style={tw`mb-8 items-center`}>
+          <Text style={tw`text-3xl font-bold text-primary-600 mb-2`}>Welcome Back</Text>
+          <Text style={tw`text-gray-500 text-center text-base`}>
             Log in to continue your journey with Food Bridge.
           </Text>
         </View>
@@ -86,10 +86,10 @@ export default function LoginScreen() {
           Log In
         </Button>
 
-        <View className="flex-row justify-center mt-6">
-          <Text className="text-gray-500">Don't have an account? </Text>
+        <View style={tw`flex-row justify-center mt-6`}>
+          <Text style={tw`text-gray-500`}>Don't have an account? </Text>
           <Text
-            className="text-primary-600 font-semibold"
+            style={tw`text-primary-600 font-semibold`}
             onPress={() => router.push('/(auth)/register')}
           >
             Sign Up

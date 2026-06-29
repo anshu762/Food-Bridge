@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Input } from '../ui/Input';
 import { Button } from '../ui/Button';
+import tw from '../../utils/tw';
 
 const step1Schema = z.object({
   foodType: z.string().min(1, 'Food type is required'),
@@ -31,9 +32,9 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
   });
 
   return (
-    <View className="flex-1 space-y-4">
+    <View style={tw`flex-1 space-y-4`}>
       <View>
-        <Text className="text-lg font-bold text-gray-900 mb-4">What are you donating?</Text>
+        <Text style={tw`text-lg font-bold text-gray-900 mb-4`}>What are you donating?</Text>
       </View>
       
       <Controller
@@ -66,8 +67,8 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
         )}
       />
 
-      <View className="flex-row space-x-4">
-        <View className="flex-1">
+      <View style={tw`flex-row space-x-4`}>
+        <View style={tw`flex-1`}>
           <Controller
             control={control}
             name="quantity"
@@ -82,7 +83,7 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
             )}
           />
         </View>
-        <View className="flex-1">
+        <View style={tw`flex-1`}>
           <Controller
             control={control}
             name="unit"
@@ -99,7 +100,7 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
         </View>
       </View>
 
-      <Button onPress={handleSubmit(onNext)} className="mt-8">Next</Button>
+      <Button onPress={handleSubmit(onNext)} style={tw`mt-8`}>Next</Button>
     </View>
   );
 }

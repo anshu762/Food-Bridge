@@ -6,6 +6,7 @@ import { TouchableCard } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { differenceInHours, differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
 import { ErrorState, EmptyState } from '../../src/components/ui/Feedback';
+import tw from '../../src/utils/tw';
 
 const TABS = ['ALL', 'AVAILABLE', 'RESERVED', 'COLLECTED', 'EXPIRED', 'CANCELLED'];
 
@@ -58,29 +59,29 @@ export default function MyListings() {
 
     return (
       <TouchableCard 
-        className="mb-4 flex-row items-center p-3"
+        style={tw`mb-4 flex-row items-center p-3`}
         onPress={() => router.push(`/(donor)/listing/${item.id}` as any)}
       >
         <Image 
           source={{ uri: item.photos[0] }} 
-          className="w-20 h-20 rounded-lg bg-gray-100" 
+          style={tw`w-20 h-20 rounded-lg bg-gray-100`} 
         />
-        <View className="ml-4 flex-1">
-          <View className="flex-row justify-between items-start mb-1">
-            <Text className="font-bold text-base text-gray-900 flex-1" numberOfLines={1}>{item.foodType}</Text>
+        <View style={tw`ml-4 flex-1`}>
+          <View style={tw`flex-row justify-between items-start mb-1`}>
+            <Text style={tw`font-bold text-base text-gray-900 flex-1`} numberOfLines={1}>{item.foodType}</Text>
             <Badge 
               status={item.status} 
             />
           </View>
-          <Text className="text-gray-600 text-sm mb-2">{item.quantity} {item.unit}</Text>
+          <Text style={tw`text-gray-600 text-sm mb-2`}>{item.quantity} {item.unit}</Text>
           
           {isAvailable && !isExpiredLocally && (
-            <Text className={`text-xs font-medium ${isUrgent ? 'text-red-500' : 'text-gray-500'}`}>
+            <Text style={tw`text-xs font-medium ${isUrgent ? 'text-red-500' : 'text-gray-500'}`}>
               {timeText}
             </Text>
           )}
           {isAvailable && isExpiredLocally && (
-            <Text className="text-xs font-medium text-red-500">Expired</Text>
+            <Text style={tw`text-xs font-medium text-red-500`}>Expired</Text>
           )}
         </View>
       </TouchableCard>
@@ -88,8 +89,8 @@ export default function MyListings() {
   };
 
   return (
-    <View className="flex-1 bg-gray-50">
-      <View className="bg-white pt-4 pb-2 border-b border-gray-100">
+    <View style={tw`flex-1 bg-gray-50`}>
+      <View style={tw`bg-white pt-4 pb-2 border-b border-gray-100`}>
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -99,14 +100,14 @@ export default function MyListings() {
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => setActiveTab(item)}
-              className={`px-4 py-2 rounded-full border ${
+              style={tw`px-4 py-2 rounded-full border ${
                 activeTab === item 
                   ? 'bg-primary-600 border-primary-600' 
                   : 'bg-white border-gray-200'
               }`}
             >
               <Text 
-                className={`text-sm font-medium ${
+                style={tw`text-sm font-medium ${
                   activeTab === item ? 'text-white' : 'text-gray-600'
                 }`}
               >
@@ -118,7 +119,7 @@ export default function MyListings() {
       </View>
 
       {isLoading ? (
-        <View className="flex-1 justify-center items-center">
+        <View style={tw`flex-1 justify-center items-center`}>
           <ActivityIndicator size="large" color="#059669" />
         </View>
       ) : isError ? (
@@ -148,7 +149,7 @@ export default function MyListings() {
           }
           ListFooterComponent={
             isFetchingNextPage ? (
-              <ActivityIndicator className="my-4" color="#059669" />
+              <ActivityIndicator style={tw`my-4`} color="#059669" />
             ) : null
           }
         />

@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import tw from '../../utils/tw';
 
 interface Step4FormData {
   pickupLat: number;
@@ -62,8 +63,8 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
   } : undefined;
 
   return (
-    <View className="flex-1 space-y-4">
-      <Text className="text-lg font-bold text-gray-900 mb-2">Where is the food?</Text>
+    <View style={tw`flex-1 space-y-4`}>
+      <Text style={tw`text-lg font-bold text-gray-900 mb-2`}>Where is the food?</Text>
 
       <Input
         label="Pickup Address"
@@ -72,7 +73,7 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
         onChangeText={setAddress}
       />
 
-      <View className="flex-1 rounded-xl overflow-hidden border border-gray-300 mt-2">
+      <View style={tw`flex-1 rounded-xl overflow-hidden border border-gray-300 mt-2`}>
         {location ? (
           <MapView
             style={{ flex: 1 }}
@@ -92,18 +93,18 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
             />
           </MapView>
         ) : (
-          <View className="flex-1 items-center justify-center bg-gray-100">
-            <Text className="text-gray-500">Loading map...</Text>
+          <View style={tw`flex-1 items-center justify-center bg-gray-100`}>
+            <Text style={tw`text-gray-500`}>Loading map...</Text>
           </View>
         )}
       </View>
-      <Text className="text-xs text-gray-500 text-center mb-2">You can drag the pin or tap to adjust the exact location.</Text>
+      <Text style={tw`text-xs text-gray-500 text-center mb-2`}>You can drag the pin or tap to adjust the exact location.</Text>
 
-      <View className="flex-row space-x-4 mt-auto">
-        <View className="flex-1">
+      <View style={tw`flex-row space-x-4 mt-auto`}>
+        <View style={tw`flex-1`}>
           <Button variant="ghost" onPress={onBack}>Back</Button>
         </View>
-        <View className="flex-1">
+        <View style={tw`flex-1`}>
           <Button onPress={handleNext} disabled={!address || !location}>Next</Button>
         </View>
       </View>

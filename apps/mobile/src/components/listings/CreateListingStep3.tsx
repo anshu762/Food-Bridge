@@ -5,6 +5,7 @@ import * as ImageManipulator from 'expo-image-manipulator';
 import { Button } from '../ui/Button';
 import { useUploadSignature } from '../../hooks/useListings';
 import { CloudUpload, X } from 'lucide-react-native';
+import tw from '../../utils/tw';
 
 interface Step3FormData {
   photos: string[];
@@ -102,35 +103,35 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
   const anyUploading = photos.some(p => p.status === 'uploading');
 
   return (
-    <View className="flex-1 space-y-6">
-      <Text className="text-lg font-bold text-gray-900">Add Photos</Text>
-      <Text className="text-sm text-gray-500 mb-4">Upload up to 5 photos (min 1).</Text>
+    <View style={tw`flex-1 space-y-6`}>
+      <Text style={tw`text-lg font-bold text-gray-900`}>Add Photos</Text>
+      <Text style={tw`text-sm text-gray-500 mb-4`}>Upload up to 5 photos (min 1).</Text>
 
-      <ScrollView horizontal className="flex-row space-x-4 mb-6">
+      <ScrollView horizontal style={tw`flex-row space-x-4 mb-6`}>
         {photos.map((photo, index) => (
-          <View key={index} className="relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 items-center justify-center border border-gray-200">
-            <Image source={{ uri: photo.uri }} className="w-full h-full" />
+          <View key={index} style={tw`relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 items-center justify-center border border-gray-200`}>
+            <Image source={{ uri: photo.uri }} style={tw`w-full h-full`} />
             
             <TouchableOpacity 
-              className="absolute top-1 right-1 bg-white/80 rounded-full p-1"
+              style={tw`absolute top-1 right-1 bg-white/80 rounded-full p-1`}
               onPress={() => removePhoto(photo.uri)}
             >
               <X size={16} color="black" />
             </TouchableOpacity>
 
             {photo.status === 'uploading' && (
-              <View className="absolute inset-0 bg-black/50 items-center justify-center">
+              <View style={tw`absolute inset-0 bg-black/50 items-center justify-center`}>
                 <ActivityIndicator color="white" />
               </View>
             )}
 
             {photo.status === 'error' && (
               <TouchableOpacity 
-                className="absolute inset-0 bg-red-500/80 items-center justify-center"
+                style={tw`absolute inset-0 bg-red-500/80 items-center justify-center`}
                 onPress={() => handleUpload(photo)}
               >
                 <CloudUpload color="white" size={24} />
-                <Text className="text-white text-xs font-bold mt-1">Retry</Text>
+                <Text style={tw`text-white text-xs font-bold mt-1`}>Retry</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -138,20 +139,20 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
 
         {photos.length < 5 && (
           <TouchableOpacity 
-            className="w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50"
+            style={tw`w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50`}
             onPress={pickImage}
           >
             <CloudUpload color="#9ca3af" size={32} />
-            <Text className="text-gray-500 mt-2 font-medium">Add Photo</Text>
+            <Text style={tw`text-gray-500 mt-2 font-medium`}>Add Photo</Text>
           </TouchableOpacity>
         )}
       </ScrollView>
 
-      <View className="flex-row space-x-4 mt-auto">
-        <View className="flex-1">
+      <View style={tw`flex-row space-x-4 mt-auto`}>
+        <View style={tw`flex-1`}>
           <Button variant="ghost" onPress={onBack}>Back</Button>
         </View>
-        <View className="flex-1">
+        <View style={tw`flex-1`}>
           <Button 
             onPress={handleNext} 
             disabled={!allSuccess || anyUploading || photos.length === 0} 
