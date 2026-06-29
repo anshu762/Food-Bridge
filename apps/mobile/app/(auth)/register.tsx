@@ -119,14 +119,14 @@ export default function RegisterScreen() {
 
         <ControlledInput control={control} name="name" label="Full Name" placeholder="John Doe" />
 
-        {role === 'DONOR' && (
+        <View style={{ display: role === 'DONOR' ? 'flex' : 'none' }}>
           <ControlledInput
             control={control}
             name="orgName"
             label="Organization Name"
             placeholder="Food Bank Inc."
           />
-        )}
+        </View>
 
         <ControlledInput
           control={control}
