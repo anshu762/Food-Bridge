@@ -34,6 +34,7 @@ import { Skeleton, ErrorState } from '../../../src/components/ui/Feedback';
 import { useToast } from '../../../src/components/ui/Toast';
 import { useAuthStore } from '../../../src/store/authStore';
 import { api } from '../../../src/services/api';
+import { notifySuccess } from '../../../src/utils/haptics';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -168,6 +169,7 @@ export default function ListingDetail() {
     try {
       await api.post('/requests', { listingId: listing.id });
       showToast({ message: 'Request submitted! Waiting for donor approval.', type: 'success' });
+      notifySuccess();
       fetchListing();
     } catch (err: unknown) {
       const errData =
@@ -220,6 +222,7 @@ export default function ListingDetail() {
       await api.patch(`/requests/${myRequest.id}/collect`);
       setCollectedQuantity(listing.quantity);
       setShowCelebration(true);
+      notifySuccess();
       fetchListing();
     } catch (err: unknown) {
       const msg =
