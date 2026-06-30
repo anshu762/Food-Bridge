@@ -8,6 +8,7 @@ import requestsRoutes from './modules/requests/requests.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import impactRoutes from './modules/impact/impact.routes';
 import verificationRoutes from './modules/verification/verification.routes';
+import usersRoutes from './modules/users/users.routes';
 import { errorHandler } from './middleware/errorHandler';
 import { startExpiryCron } from './jobs/expiry.cron';
 
@@ -27,6 +28,7 @@ app.use('/requests', requestsRoutes);
 app.use('/notifications', notificationsRoutes);
 app.use('/impact', impactRoutes);
 app.use('/verification', verificationRoutes);
+app.use('/users', usersRoutes);
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

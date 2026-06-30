@@ -31,6 +31,18 @@ export const uploadVerificationDocument = async (
   }
 };
 
+export const getMyDocuments = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const docs = await prisma.verificationDocument.findMany({
+      where: { userId: req.user!.id },
+      orderBy: { createdAt: 'desc' },
+    });
+    res.status(StatusCodes.OK).json({ success: true, data: docs });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getPendingVerifications = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const page = parseInt(req.query.page as string) || 1;

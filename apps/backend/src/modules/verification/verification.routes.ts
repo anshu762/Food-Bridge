@@ -6,6 +6,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.post('/upload', verificationController.uploadVerificationDocument);
+router.get('/documents', verificationController.getMyDocuments);
 router.get('/pending', authorize('ADMIN'), verificationController.getPendingVerifications);
 router.patch('/:id/approve', authorize('ADMIN'), verificationController.approveVerification);
 router.patch('/:id/reject', authorize('ADMIN'), verificationController.rejectVerification);
