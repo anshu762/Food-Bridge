@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 import { StatusCodes } from 'http-status-codes';
+import * as Sentry from '@sentry/node';
 
 export class AppError extends Error {
   public statusCode: number;
@@ -93,6 +94,18 @@ export const errorHandler = (
 
   // Fallback to 500
   console.error('Unhandled Error:', err);
+
+  // Capture in Sentry for production tracking
+  Sentry.captureException(err, {
+    extra: {
+      url: req.originalUrl,
+      method: req.method,
+      body: req.body,
+      query: req.query,
+      user: req.user?.id,
+    },
+  });
+
   const isProduction = process.env.NODE_ENV === 'production';
   return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
     success: false,
