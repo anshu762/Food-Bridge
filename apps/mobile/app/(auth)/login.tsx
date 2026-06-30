@@ -10,6 +10,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import { api } from '../../src/services/api';
 import { useToast } from '../../src/components/ui/Toast';
 import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
+import { registerForPushNotifications } from '../../src/utils/notifications';
 import { z } from 'zod';
 import tw from '../../src/utils/tw';
 
@@ -41,6 +42,7 @@ export default function LoginScreen() {
 
       const { user, accessToken, refreshToken } = res.data.data;
       await login(user, accessToken, refreshToken);
+      registerForPushNotifications();
     } catch (error: any) {
       showToast({
         message: error.response?.data?.error || 'Invalid email or password. Please try again.',
