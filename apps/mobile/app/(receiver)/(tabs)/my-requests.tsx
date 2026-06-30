@@ -17,6 +17,7 @@ import {
   Navigation,
   User,
 } from 'lucide-react-native';
+import { notifySuccess, notifyWarning } from '../../../src/utils/haptics';
 import { formatDistanceToNow } from 'date-fns';
 import tw from '../../../src/utils/tw';
 import { Button } from '../../../src/components/ui/Button';
@@ -129,6 +130,7 @@ export default function MyRequests() {
     try {
       await api.patch(`/requests/${requestId}/cancel`);
       showToast({ message: 'Request cancelled.', type: 'info' });
+      notifyWarning();
       fetchRequests();
     } catch (err: unknown) {
       const msg =
@@ -164,6 +166,7 @@ export default function MyRequests() {
         message: `Nice! You helped save ${request.listing.quantity} ${request.listing.unit} of food!`,
         type: 'success',
       });
+      notifySuccess();
       fetchRequests();
     } catch (err: unknown) {
       const msg =
