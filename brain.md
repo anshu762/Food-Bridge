@@ -2,21 +2,17 @@
 
 This document serves as the global memory for the FoodBridge project. It tracks the context, architecture, decisions, and progress of each build phase.
 
-## Current Project State (Phase 0 - Initialization)
+## Current Project State (Phase 6 - Complete)
 
-The project is a monorepo (pnpm workspaces) for a food donation matching platform, connecting donors with receivers.
+The project is a monorepo (pnpm workspaces) for a food donation matching platform, connecting donors with receivers. All 6 phases are complete.
 
 ### Tech Stack
 
-- **Backend:** Express.js, Prisma, NeonDB (PostgreSQL)
-- **Mobile App:** React Native, Expo, NativeWind, Expo Router
-- **Shared:** Zod, TypeScript
-
-### Project Structure
-
-- `apps/backend`: Minimal Express server setup. Prisma is initialized but has no models in the schema yet. Health route `/health` is available.
-- `apps/mobile`: Expo Router setup with route groups for different user roles: `(admin)`, `(auth)`, `(donor)`, `(receiver)`.
-- `packages/shared`: Setup for shared Zod schemas and TypeScript types.
+- **Backend:** Express.js, Prisma, NeonDB (PostgreSQL), Cloudinary, Expo Push SDK
+- **Mobile App:** React Native 0.81, Expo SDK 54, Expo Router 6, twrnc (Tailwind), Zustand, React Query, react-hook-form, Zod
+- **Shared:** Zod schemas + TypeScript types used by both backend and frontend
+- **Haptics:** expo-haptics for key success action feedback
+- **Push:** expo-notifications for foreground/background/killed deep-linking
 
 ---
 
@@ -73,3 +69,18 @@ _(Add new phases below as they are completed...)_
 - **Listing Detail (`listing/[id].tsx`):** Photo gallery with pagination dots, foodType, qty, prep time, safe-until countdown, pickup area, donor org name. "Request this food" button with confirmation dialog + disabled after tap. 409 `LISTING_NOT_AVAILABLE` → Alert "just reserved by someone else" + refresh. Existing request status shown inline. ACCEPTED state reveals pickup address, donor contact (email/phone with tappable links), "Get Directions" deep link, "Mark as Collected" button. Collect flow: confirmation → API call → celebration overlay with impact message → navigate to My Requests.
 - **My Requests (`(tabs)/my-requests.tsx`):** Tabbed view: Pending / Approved / Rejected / History (COLLECTED/CANCELLED). Each row: listing thumbnail, status badge, relative timestamp. Pending tab: "Cancel Request" with confirmation. Approved tab: pickup details, directions link, "Mark Collected". Distinct empty state per tab.
 - **TypeScript & Lint:** Zero TS errors, zero ESLint errors across all receiver files. `(router as any).push()` pattern used for dynamic routes (Expo Router typed routes limitation).
+
+### Phase 6: Shared Flows & Polish (Completed)
+
+- **Profile Screen (shared, role-aware):** View/edit name, phone, orgName (donors). Change password with current/new validation matching registration rules. Verification status section showing PENDING/APPROVED/REJECTED with re-upload on rejection and document prompts on pending. Logout with confirmation dialog. Delete account with irreversible warning — calls `DELETE /users/me` which soft-deletes by anonymizing PII.
+- **Backend Users Module:** Added `GET /users/me`, `PATCH /users/me`, `PUT /users/me/password`, `DELETE /users/me` (soft-delete). Added `GET /verification/documents`.
+- **Notifications Screen (both roles):** Paginated FlatList from `GET /notifications`. Unread visual distinction, mark-all-read, deep-link on tap, pull-to-refresh. Skeleton/empty/error states.
+- **Push Notification Registration:** Permissions requested after login (contextual, not app launch). Token registered via `POST /notifications/register-token`. `expo-notifications` added.
+- **Deep Linking (3 app states):** Root `_layout.tsx` handles foreground (listener), background/killed (`getLastNotificationResponseAsync`). Unauthenticated deep links stored and replayed after auth redirect.
+- **Unread Badge:** Red badge on tab bar icon; polls every 30s via `useUnreadCount`.
+- **Impact Dashboard (both roles):** Personal stats (`/impact/me`: meals + kg) + platform stats (`/impact/platform`). Role-aware framing (donor sees "Meals Provided", receiver sees "Meals Collected"). Share button with native share sheet. Empty state for new users with encouraging copy.
+- **Tab Layout Updates:** Added `(tabs)/notifications.tsx` and `(tabs)/impact.tsx` to both donor and receiver tab groups. Both layouts now have 6 tabs.
+- **Reusable Upload Hook:** `src/hooks/useUpload.ts` — image picker + manipulator + Cloudinary upload with progress tracking and retry, used by both listing creation and verification document upload.
+- **Haptics (expo-haptics):** Added to key success actions across all Phase 6 screens: profile save, password change, collect food, cancel request, request submission, share impact.
+- **Global Polish Audit:** Screened all screens from Phases 3-5. Findings documented above (donor screens use spinners not skeletons; create.tsx has inline error not full ErrorState). Defensive data access confirmed via TypeScript strict mode across all new code.
+- **TypeScript & Lint:** Zero errors in all Phase 6 files. 19 warnings (all acceptable: `any` casts per codebase pattern, hook deps).
