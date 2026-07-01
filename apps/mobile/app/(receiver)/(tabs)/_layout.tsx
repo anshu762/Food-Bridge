@@ -8,15 +8,23 @@ function NotificationsBadge() {
   const { data: count } = useUnreadCount();
   if (!count || count === 0) return null;
   return (
-    <View style={tw`absolute -top-1 -right-2 bg-red-500 rounded-full h-4 min-w-4 items-center justify-center px-1`}>
-      <Text style={tw`text-white text-xs font-bold`}>{count > 9 ? '9+' : count}</Text>
+    <View
+      style={tw`absolute -top-4 -right-8 bg-danger rounded-pill h-16 min-w-[16px] items-center justify-center px-4`}
+    >
+      <Text style={tw`text-surface text-caption font-bold`}>{count > 9 ? '9+' : count}</Text>
     </View>
   );
 }
 
 export default function ReceiverTabsLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: '#5f8f2a', headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        tabBarActiveTintColor: '#1B7A4D',
+        tabBarInactiveTintColor: '#4B5563',
+        headerShown: false,
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{

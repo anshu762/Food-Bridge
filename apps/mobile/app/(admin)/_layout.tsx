@@ -6,25 +6,26 @@ export default function AdminLayout() {
     <Tabs
       screenOptions={{
         headerShown: true,
-        tabBarActiveTintColor: '#0f172a', // Slate-900
-        tabBarInactiveTintColor: '#64748b', // Slate-500
+        tabBarActiveTintColor: '#1B7A4D',
+        tabBarInactiveTintColor: '#4B5563',
         tabBarStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
-          borderTopColor: '#f1f5f9', // Slate-100
+          borderTopColor: '#E5E7EB',
           elevation: 0,
           shadowOpacity: 0,
         },
         headerStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: '#FFFFFF',
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: '#f1f5f9',
+          borderBottomColor: '#E5E7EB',
         },
         headerTitleStyle: {
-          fontWeight: 'bold',
-          color: '#0f172a',
+          fontWeight: '700',
+          color: '#111827',
+          fontSize: 20,
         },
       }}
     >

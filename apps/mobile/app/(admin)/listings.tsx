@@ -4,7 +4,6 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Alert,
   RefreshControl,
   Modal,
   TextInput,
@@ -16,7 +15,8 @@ import { Button } from '../../src/components/ui/Button';
 import { ShieldAlert, Trash2 } from 'lucide-react-native';
 import tw from '../../src/utils/tw';
 import { formatDistanceToNow } from 'date-fns';
-import { useToast } from '../../src/components/ui/Toast';
+import { useUI } from '../../src/components/ui/Providers';
+import { Card } from '../../src/components/ui/Card';
 
 export default function ListingsModerationScreen() {
   const [filterStatus, setFilterStatus] = useState<string | undefined>('AVAILABLE');
@@ -34,7 +34,7 @@ export default function ListingsModerationScreen() {
   } = useAdminListings(filterStatus);
 
   const removeMutation = useRemoveListing();
-  const { showToast } = useToast();
+  const { showToast } = useUI();
 
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
@@ -50,7 +50,7 @@ export default function ListingsModerationScreen() {
 
   const submitRemove = async () => {
     if (!selectedListingId || !removeReason.trim()) {
-      Alert.alert('Error', 'Please provide a reason for removal.');
+      showToast({ message: 'Please provide a reason for removal.', type: 'error' });
       return;
     }
 
@@ -71,25 +71,25 @@ export default function ListingsModerationScreen() {
   };
 
   return (
-    <View style={tw`flex-1 bg-slate-50`}>
-      <View style={tw`bg-white px-4 py-3 border-b border-slate-200 z-10`}>
+    <View style={tw`flex-1 bg-neutral-50`}>
+      <View style={tw`bg-surface px-16 py-12 border-b border-neutral-200 z-10`}>
         <View style={tw`flex-row`}>
           <TouchableOpacity
-            style={tw`px-4 py-2 rounded-full border ${filterStatus === 'AVAILABLE' ? 'bg-slate-800 border-slate-800' : 'bg-white border-slate-300'} mr-2`}
+            style={tw`px-16 py-8 rounded-pill border ${filterStatus === 'AVAILABLE' ? 'bg-primary border-primary' : 'bg-surface border-neutral-200'} mr-8`}
             onPress={() => setFilterStatus('AVAILABLE')}
           >
             <Text
-              style={tw`text-sm font-semibold ${filterStatus === 'AVAILABLE' ? 'text-white' : 'text-slate-600'}`}
+              style={tw`text-caption font-semibold ${filterStatus === 'AVAILABLE' ? 'text-white' : 'text-neutral-600'}`}
             >
               Available
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={tw`px-4 py-2 rounded-full border ${filterStatus === undefined ? 'bg-slate-800 border-slate-800' : 'bg-white border-slate-300'} mr-2`}
+            style={tw`px-16 py-8 rounded-pill border ${filterStatus === undefined ? 'bg-primary border-primary' : 'bg-surface border-neutral-200'} mr-8`}
             onPress={() => setFilterStatus(undefined)}
           >
             <Text
-              style={tw`text-sm font-semibold ${filterStatus === undefined ? 'text-white' : 'text-slate-600'}`}
+              style={tw`text-caption font-semibold ${filterStatus === undefined ? 'text-white' : 'text-neutral-600'}`}
             >
               All
             </Text>
@@ -98,9 +98,9 @@ export default function ListingsModerationScreen() {
       </View>
 
       {isLoading && !isRefetching ? (
-        <View style={tw`p-4`}>
+        <View style={tw`p-16`}>
           {[1, 2, 3].map((i) => (
-            <Skeleton key={i} style={tw`w-full h-40 rounded-xl mb-4`} />
+            <Skeleton key={i} style={tw`w-full h-160 rounded-md mb-16`} />
           ))}
         </View>
       ) : isError ? (
@@ -112,8 +112,10 @@ export default function ListingsModerationScreen() {
         <FlatList
           data={listings}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={tw`p-4 ${listings.length === 0 ? 'flex-1' : ''}`}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          contentContainerStyle={tw`p-16 ${listings.length === 0 ? 'flex-1' : ''}`}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#1B7A4D" />
+          }
           ListEmptyComponent={
             <EmptyState
               title="No listings found"
@@ -132,55 +134,55 @@ export default function ListingsModerationScreen() {
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextPage ? (
-              <View style={tw`py-4 items-center`}>
-                <Text style={tw`text-slate-500`}>Loading more listings...</Text>
+              <View style={tw`py-16 items-center`}>
+                <Text style={tw`text-neutral-500`}>Loading more listings...</Text>
               </View>
             ) : null
           }
           renderItem={({ item }) => (
-            <View
-              style={tw`bg-white rounded-xl border border-slate-200 overflow-hidden mb-4 shadow-sm`}
-            >
+            <Card style={tw`mb-16 overflow-hidden bg-surface border-neutral-200 p-0`}>
               <View style={tw`flex-row`}>
-                <Image source={{ uri: item.imageUrl }} style={tw`w-32 h-32 bg-slate-200`} />
-                <View style={tw`p-3 flex-1 justify-between`}>
+                <Image source={{ uri: item.imageUrl }} style={tw`w-128 h-128 bg-neutral-200`} />
+                <View style={tw`p-12 flex-1 justify-between`}>
                   <View>
                     <View style={tw`flex-row justify-between items-start`}>
                       <Text
-                        style={tw`text-base font-bold text-slate-900 mb-1 flex-1`}
+                        style={tw`text-body-emphasis text-neutral-900 mb-4 flex-1`}
                         numberOfLines={1}
                       >
                         {item.title}
                       </Text>
-                      <View style={tw`bg-slate-100 px-2 py-0.5 rounded ml-2`}>
-                        <Text style={tw`text-slate-600 text-xs font-semibold`}>{item.status}</Text>
+                      <View style={tw`bg-neutral-100 px-8 py-2 rounded ml-8`}>
+                        <Text style={tw`text-neutral-600 text-caption font-semibold`}>
+                          {item.status}
+                        </Text>
                       </View>
                     </View>
-                    <Text style={tw`text-slate-600 text-sm`} numberOfLines={1}>
+                    <Text style={tw`text-neutral-600 text-body`} numberOfLines={1}>
                       {item.donor?.orgName || item.donor?.name || 'Unknown Donor'}
                     </Text>
-                    <Text style={tw`text-slate-400 text-xs mt-1`}>
+                    <Text style={tw`text-neutral-400 text-caption mt-4`}>
                       {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
                     </Text>
                   </View>
 
-                  <View style={tw`flex-row justify-between items-center mt-2`}>
-                    <Text style={tw`text-slate-500 text-xs font-medium`}>
+                  <View style={tw`flex-row justify-between items-center mt-8`}>
+                    <Text style={tw`text-neutral-500 text-caption font-medium`}>
                       {item._count?.requests || 0} Requests
                     </Text>
 
                     {(item.status === 'AVAILABLE' || item.status === 'RESERVED') && (
                       <TouchableOpacity
-                        style={tw`bg-red-50 p-2 rounded-full flex-row items-center`}
+                        style={tw`bg-danger/10 p-8 rounded-pill flex-row items-center`}
                         onPress={() => handleRemovePrompt(item.id)}
                       >
-                        <Trash2 size={16} color="#ef4444" />
+                        <Trash2 size={16} color="#D9432E" />
                       </TouchableOpacity>
                     )}
                   </View>
                 </View>
               </View>
-            </View>
+            </Card>
           )}
         />
       )}
@@ -192,30 +194,30 @@ export default function ListingsModerationScreen() {
         animationType="fade"
         onRequestClose={() => setRemoveModalVisible(false)}
       >
-        <View style={tw`flex-1 bg-black/50 justify-center items-center px-4`}>
-          <View style={tw`bg-white w-full rounded-2xl p-6`}>
-            <Text style={tw`text-xl font-bold text-slate-900 mb-2`}>Force Remove Listing</Text>
-            <Text style={tw`text-slate-600 mb-4`}>
+        <View style={tw`flex-1 bg-neutral-900/50 justify-center items-center px-16`}>
+          <View style={tw`bg-surface w-full rounded-md p-24`}>
+            <Text style={tw`text-h2 font-bold text-neutral-900 mb-8`}>Force Remove Listing</Text>
+            <Text style={tw`text-body text-neutral-600 mb-16`}>
               Please provide a reason for removing this listing. The donor will be notified.
             </Text>
 
             <TextInput
-              style={tw`border border-slate-300 rounded-xl p-4 bg-slate-50 text-slate-900 min-h-[100px] mb-6`}
+              style={tw`border border-neutral-200 rounded-md p-16 bg-neutral-50 text-neutral-900 min-h-[100px] mb-24`}
               placeholder="e.g. Violates community guidelines, not food..."
-              placeholderTextColor="#94a3b8"
+              placeholderTextColor="#9CA3AF"
               value={removeReason}
               onChangeText={setRemoveReason}
               multiline
               textAlignVertical="top"
             />
 
-            <View style={tw`flex-row space-x-3`}>
-              <View style={tw`flex-1`}>
+            <View style={tw`flex-row space-x-12`}>
+              <View style={tw`flex-1 mr-8`}>
                 <Button variant="ghost" onPress={() => setRemoveModalVisible(false)}>
                   Cancel
                 </Button>
               </View>
-              <View style={tw`flex-1`}>
+              <View style={tw`flex-1 ml-8`}>
                 <Button variant="primary" onPress={submitRemove} loading={removeMutation.isPending}>
                   Remove
                 </Button>

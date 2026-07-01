@@ -7,6 +7,7 @@ import * as Sentry from '@sentry/react-native';
 import { AppProvider } from '../src/providers/AppProvider';
 import { useAuthStore } from '../src/store/authStore';
 import { useNetworkStatus } from '../src/hooks/useNetworkStatus';
+import tw from '../src/utils/tw';
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN || 'https://public@sentry.example.com/1',
@@ -100,10 +101,8 @@ function RootNavigation() {
     <View style={{ flex: 1 }}>
       <StatusBar style="dark" />
       {!isOnline && (
-        <View style={{ paddingTop: 50, backgroundColor: '#EF4444', paddingBottom: 10 }}>
-          <Text style={{ color: 'white', textAlign: 'center', fontWeight: '600' }}>
-            No Internet Connection
-          </Text>
+        <View style={tw`bg-danger items-center justify-center pt-48 pb-12`}>
+          <Text style={tw`text-surface text-body-emphasis`}>No Internet Connection</Text>
         </View>
       )}
       <Stack screenOptions={{ headerShown: false }}>

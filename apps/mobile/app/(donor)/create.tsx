@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, BackHandler, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  BackHandler,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useDraftStore, DraftListing } from '../../src/store/useDraftStore';
 import { useCreateListing } from '../../src/hooks/useListings';
@@ -8,10 +15,9 @@ import { CreateListingStep2 } from '../../src/components/listings/CreateListingS
 import { CreateListingStep3 } from '../../src/components/listings/CreateListingStep3';
 import { CreateListingStep4 } from '../../src/components/listings/CreateListingStep4';
 import { CreateListingReview } from '../../src/components/listings/CreateListingReview';
+import { ProgressStepper } from '../../src/components/ui/ProgressStepper';
 import { ChevronLeft } from 'lucide-react-native';
 import tw from '../../src/utils/tw';
-
-const TOTAL_STEPS = 5;
 
 export default function CreateListing() {
   const router = useRouter();
@@ -36,7 +42,7 @@ export default function CreateListing() {
   const handleSubmit = async () => {
     try {
       setSubmitError(null);
-      
+
       const payload = {
         title: draft.title!,
         foodType: draft.foodType!,
@@ -52,13 +58,14 @@ export default function CreateListing() {
       };
 
       const result = await createListingMutation.mutateAsync(payload as any);
-      
+
       // Success! Clear draft and go to listing details
       clearDraft();
       router.replace(`/(donor)/listing/${result.id}` as any);
     } catch (error: any) {
       // Extract precise error message
-      const msg = error.response?.data?.error?.message || error.message || 'Failed to create listing';
+      const msg =
+        error.response?.data?.error?.message || error.message || 'Failed to create listing';
       if (error.response?.status === 403) {
         setSubmitError(`${msg}. Please complete identity verification.`);
       } else {
@@ -81,35 +88,38 @@ export default function CreateListing() {
   }, [step]);
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined} 
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       style={tw`flex-1 bg-white`}
     >
-      <View style={tw`px-4 py-4 flex-row items-center border-b border-gray-100`}>
-        <TouchableOpacity onPress={handleBack} style={tw`p-2 -ml-2`}>
-          <ChevronLeft color="#374151" size={24} />
+      <View style={tw`px-16 py-16 flex-row items-center border-b border-neutral-100 mb-16`}>
+        <TouchableOpacity onPress={handleBack} style={tw`p-8 -ml-8`}>
+          <ChevronLeft color="#111827" size={24} />
         </TouchableOpacity>
-        <Text style={tw`text-lg font-bold text-gray-900 ml-2`}>Create Listing</Text>
-        <View style={tw`flex-1`} />
-        <Text style={tw`text-sm font-medium text-gray-500`}>Step {step} of {TOTAL_STEPS}</Text>
+        <Text style={tw`text-h2 text-neutral-900 ml-8`}>Create Listing</Text>
       </View>
 
-      <View style={tw`h-1 bg-gray-100 w-full`}>
-        <View 
-          style={[tw`h-full bg-primary-600`, { width: `${(step / TOTAL_STEPS) * 100}%` }]} 
-        />
-      </View>
+      <ProgressStepper
+        steps={['Details', 'Timing', 'Photos', 'Location', 'Review']}
+        currentStepIndex={step - 1}
+      />
 
-      <View style={tw`flex-1 p-6`}>
+      <View style={tw`flex-1 p-16`}>
         {step === 1 && <CreateListingStep1 initialData={draft as any} onNext={handleNext} />}
-        {step === 2 && <CreateListingStep2 initialData={draft} onNext={handleNext} onBack={handleBack} />}
-        {step === 3 && <CreateListingStep3 initialData={draft} onNext={handleNext} onBack={handleBack} />}
-        {step === 4 && <CreateListingStep4 initialData={draft} onNext={handleNext} onBack={handleBack} />}
+        {step === 2 && (
+          <CreateListingStep2 initialData={draft} onNext={handleNext} onBack={handleBack} />
+        )}
+        {step === 3 && (
+          <CreateListingStep3 initialData={draft} onNext={handleNext} onBack={handleBack} />
+        )}
+        {step === 4 && (
+          <CreateListingStep4 initialData={draft} onNext={handleNext} onBack={handleBack} />
+        )}
         {step === 5 && (
-          <CreateListingReview 
-            data={draft as DraftListing} 
-            onSubmit={handleSubmit} 
-            onBack={handleBack} 
+          <CreateListingReview
+            data={draft as DraftListing}
+            onSubmit={handleSubmit}
+            onBack={handleBack}
             isSubmitting={createListingMutation.isPending}
             error={submitError}
           />

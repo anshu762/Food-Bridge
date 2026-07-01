@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, ScrollView, Platform } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  ScrollView,
+  Platform,
+} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { Button } from '../ui/Button';
@@ -25,7 +33,7 @@ interface PhotoUpload {
 
 export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
   const [photos, setPhotos] = useState<PhotoUpload[]>(
-    (initialData.photos || []).map(url => ({ uri: url, status: 'success', cloudinaryUrl: url }))
+    (initialData.photos || []).map((url) => ({ uri: url, status: 'success', cloudinaryUrl: url })),
   );
   const uploadSignatureMutation = useUploadSignature();
 
@@ -52,13 +60,16 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
       const manipResult = await ImageManipulator.manipulateAsync(
         photo.uri,
         [{ resize: { width: 800 } }],
-        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG },
       );
 
-      setPhotos(prev => prev.map(p => p.uri === photo.uri ? { ...p, status: 'uploading' } : p));
+      setPhotos((prev) =>
+        prev.map((p) => (p.uri === photo.uri ? { ...p, status: 'uploading' } : p)),
+      );
 
       // 2. Get signature
-      const { signature, timestamp, apiKey, cloudName, folder } = await uploadSignatureMutation.mutateAsync();
+      const { signature, timestamp, apiKey, cloudName, folder } =
+        await uploadSignatureMutation.mutateAsync();
 
       const formData = new FormData();
       if (Platform.OS === 'web') {
@@ -82,31 +93,37 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
         method: 'POST',
         body: formData,
       });
-      
+
       const data = await response.json();
-      
+
       if (data.secure_url) {
-        setPhotos(prev => prev.map(p => p.uri === photo.uri ? { ...p, status: 'success', cloudinaryUrl: data.secure_url } : p));
+        setPhotos((prev) =>
+          prev.map((p) =>
+            p.uri === photo.uri ? { ...p, status: 'success', cloudinaryUrl: data.secure_url } : p,
+          ),
+        );
       } else {
         throw new Error('Upload failed');
       }
     } catch (error) {
-      setPhotos(prev => prev.map(p => p.uri === photo.uri ? { ...p, status: 'error' } : p));
+      setPhotos((prev) => prev.map((p) => (p.uri === photo.uri ? { ...p, status: 'error' } : p)));
     }
   };
 
   const removePhoto = (uri: string) => {
-    setPhotos(photos.filter(p => p.uri !== uri));
+    setPhotos(photos.filter((p) => p.uri !== uri));
   };
 
   const handleNext = () => {
-    const uploadedPhotos = photos.filter(p => p.status === 'success' && p.cloudinaryUrl).map(p => p.cloudinaryUrl!);
+    const uploadedPhotos = photos
+      .filter((p) => p.status === 'success' && p.cloudinaryUrl)
+      .map((p) => p.cloudinaryUrl!);
     if (uploadedPhotos.length === 0) return;
     onNext({ photos: uploadedPhotos });
   };
 
-  const allSuccess = photos.length > 0 && photos.every(p => p.status === 'success');
-  const anyUploading = photos.some(p => p.status === 'uploading');
+  const allSuccess = photos.length > 0 && photos.every((p) => p.status === 'success');
+  const anyUploading = photos.some((p) => p.status === 'uploading');
 
   return (
     <View style={tw`flex-1 space-y-6`}>
@@ -115,10 +132,13 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
 
       <ScrollView horizontal style={tw`flex-row space-x-4 mb-6`}>
         {photos.map((photo, index) => (
-          <View key={index} style={tw`relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 items-center justify-center border border-gray-200`}>
+          <View
+            key={index}
+            style={tw`relative w-32 h-32 rounded-xl overflow-hidden bg-gray-100 items-center justify-center border border-gray-200`}
+          >
             <Image source={{ uri: photo.uri }} style={tw`w-full h-full`} />
-            
-            <TouchableOpacity 
+
+            <TouchableOpacity
               style={tw`absolute top-1 right-1 bg-white/80 rounded-full p-1`}
               onPress={() => removePhoto(photo.uri)}
             >
@@ -126,25 +146,26 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
             </TouchableOpacity>
 
             {photo.status === 'uploading' && (
-              <View style={tw`absolute inset-0 bg-black/50 items-center justify-center`}>
-                <ActivityIndicator color="white" />
+              <View style={tw`absolute inset-0 bg-neutral-900/50 items-center justify-center`}>
+                <ActivityIndicator color="#FFFFFF" size="small" />
               </View>
             )}
 
             {photo.status === 'error' && (
-              <TouchableOpacity 
-                style={tw`absolute inset-0 bg-red-500/80 items-center justify-center`}
+              <TouchableOpacity
+                style={tw`absolute inset-0 bg-danger/80 items-center justify-center`}
                 onPress={() => handleUpload(photo)}
+                activeOpacity={0.7}
               >
-                <CloudUpload color="white" size={24} />
-                <Text style={tw`text-white text-xs font-bold mt-1`}>Retry</Text>
+                <CloudUpload color="#FFFFFF" size={24} />
+                <Text style={tw`text-surface text-caption font-bold mt-4`}>Failed. Retry?</Text>
               </TouchableOpacity>
             )}
           </View>
         ))}
 
         {photos.length < 5 && (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={tw`w-32 h-32 rounded-xl border-2 border-dashed border-gray-300 items-center justify-center bg-gray-50`}
             onPress={pickImage}
           >
@@ -156,12 +177,14 @@ export function CreateListingStep3({ initialData, onNext, onBack }: Props) {
 
       <View style={tw`flex-row space-x-4 mt-auto`}>
         <View style={tw`flex-1`}>
-          <Button variant="ghost" onPress={onBack}>Back</Button>
+          <Button variant="ghost" onPress={onBack}>
+            Back
+          </Button>
         </View>
         <View style={tw`flex-1`}>
-          <Button 
-            onPress={handleNext} 
-            disabled={!allSuccess || anyUploading || photos.length === 0} 
+          <Button
+            onPress={handleNext}
+            disabled={!allSuccess || anyUploading || photos.length === 0}
           >
             Next
           </Button>

@@ -1,22 +1,17 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { registerSchema } from '@food-bridge/shared';
 import { ControlledInput } from '../../src/components/ui/Input';
 import { Button } from '../../src/components/ui/Button';
+import { TouchableCard } from '../../src/components/ui/Card';
 import { useAuthStore } from '../../src/store/authStore';
 import { api } from '../../src/services/api';
-import { useToast } from '../../src/components/ui/Toast';
+import { useUI } from '../../src/components/ui/Providers';
 import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
+import { HeartHandshake, PackageOpen } from 'lucide-react-native';
 import { z } from 'zod';
 import tw from '../../src/utils/tw';
 
@@ -27,7 +22,7 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuthStore();
-  const { showToast } = useToast();
+  const { showToast } = useUI();
   const { isOnline } = useNetworkStatus();
 
   const { control, handleSubmit, setValue } = useForm<RegisterForm>({
@@ -69,50 +64,52 @@ export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={tw`flex-1 bg-white`}
+      style={tw`flex-1 bg-surface`}
     >
-      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 40 }}>
-        <View style={tw`mb-6 items-center`}>
-          <Text style={tw`text-3xl font-bold text-primary-600 mb-2`}>Create Account</Text>
-          <Text style={tw`text-gray-500 text-center text-base`}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, paddingTop: 48 }}>
+        <View style={tw`mb-24 items-center`}>
+          <Text style={tw`text-display text-primary-dark mb-8`}>Create Account</Text>
+          <Text style={tw`text-body text-neutral-600 text-center`}>
             Join Food Bridge to start making a difference.
           </Text>
         </View>
 
         {/* Role Selector */}
-        <View style={tw`flex-row bg-gray-100 rounded-xl p-1 mb-6`}>
-          <TouchableOpacity
-            onPress={() => handleRoleChange('RECEIVER')}
+        <View style={tw`flex-row justify-between mb-32`}>
+          <TouchableCard
             style={[
-              tw`flex-1 py-3 items-center rounded-lg`,
-              role === 'RECEIVER' && tw`bg-white shadow-sm`,
+              tw`flex-1 mr-8 items-center py-24`,
+              role === 'RECEIVER' ? tw`border-primary bg-primary-50` : tw`border-neutral-200`,
             ]}
+            onPress={() => handleRoleChange('RECEIVER')}
           >
+            <PackageOpen size={32} color={role === 'RECEIVER' ? '#1B7A4D' : '#9CA3AF'} />
             <Text
               style={[
-                tw`font-semibold`,
-                role === 'RECEIVER' ? tw`text-primary-700` : tw`text-gray-500`,
+                tw`mt-8 text-body-emphasis`,
+                role === 'RECEIVER' ? tw`text-primary-dark` : tw`text-neutral-600`,
               ]}
             >
               Receiver
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => handleRoleChange('DONOR')}
+          </TouchableCard>
+          <TouchableCard
             style={[
-              tw`flex-1 py-3 items-center rounded-lg`,
-              role === 'DONOR' && tw`bg-white shadow-sm`,
+              tw`flex-1 ml-8 items-center py-24`,
+              role === 'DONOR' ? tw`border-primary bg-primary-50` : tw`border-neutral-200`,
             ]}
+            onPress={() => handleRoleChange('DONOR')}
           >
+            <HeartHandshake size={32} color={role === 'DONOR' ? '#1B7A4D' : '#9CA3AF'} />
             <Text
               style={[
-                tw`font-semibold`,
-                role === 'DONOR' ? tw`text-primary-700` : tw`text-gray-500`,
+                tw`mt-8 text-body-emphasis`,
+                role === 'DONOR' ? tw`text-primary-dark` : tw`text-neutral-600`,
               ]}
             >
               Donor
             </Text>
-          </TouchableOpacity>
+          </TouchableCard>
         </View>
 
         <ControlledInput control={control} name="name" label="Full Name" placeholder="John Doe" />
@@ -152,14 +149,14 @@ export default function RegisterScreen() {
           secureTextEntry
         />
 
-        <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading} style={tw`mt-4`}>
+        <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading} style={tw`mt-16`}>
           Sign Up
         </Button>
 
-        <View style={tw`flex-row justify-center mt-6 mb-8`}>
-          <Text style={tw`text-gray-500`}>Already have an account? </Text>
+        <View style={tw`flex-row justify-center mt-24 mb-32`}>
+          <Text style={tw`text-body text-neutral-600`}>Already have an account? </Text>
           <Text
-            style={tw`text-primary-600 font-semibold`}
+            style={tw`text-body-emphasis text-primary`}
             onPress={() => router.push('/(auth)/login')}
           >
             Log In

@@ -3,6 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Input } from '../ui/Input';
+import { Select } from '../ui/Select';
 import { Button } from '../ui/Button';
 import tw from '../../utils/tw';
 
@@ -16,19 +17,30 @@ const step1Schema = z.object({
 
 export type Step1FormData = z.infer<typeof step1Schema>;
 
+const UNIT_OPTIONS = [
+  { label: 'Kilograms (KG)', value: 'KG' },
+  { label: 'Liters (L)', value: 'LITER' },
+  { label: 'Items', value: 'ITEM' },
+  { label: 'Portions', value: 'PORTION' },
+];
+
 interface Props {
   initialData: Partial<Step1FormData>;
   onNext: (data: Step1FormData) => void;
 }
 
 export function CreateListingStep1({ initialData, onNext }: Props) {
-  const { control, handleSubmit, formState: { errors } } = useForm<Step1FormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Step1FormData>({
     resolver: zodResolver(step1Schema),
     defaultValues: {
       title: initialData.title || '',
       foodType: initialData.foodType || '',
       description: initialData.description || '',
-      quantity: initialData.quantity as any || '',
+      quantity: (initialData.quantity as any) || '',
       unit: initialData.unit || 'ITEM',
     },
   });
@@ -38,7 +50,7 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
       <View>
         <Text style={tw`text-lg font-bold text-gray-900 mb-4`}>What are you donating?</Text>
       </View>
-      
+
       <Controller
         control={control}
         name="title"
@@ -104,11 +116,12 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
             control={control}
             name="unit"
             render={({ field: { onChange, value } }) => (
-              <Input
+              <Select
                 label="Unit"
-                placeholder="KG/LITER/ITEM"
+                placeholder="Select..."
+                options={UNIT_OPTIONS}
                 value={value}
-                onChangeText={onChange}
+                onSelect={onChange}
                 error={errors.unit?.message}
               />
             )}
@@ -116,7 +129,9 @@ export function CreateListingStep1({ initialData, onNext }: Props) {
         </View>
       </View>
 
-      <Button onPress={handleSubmit(onNext)} style={tw`mt-8`}>Next</Button>
+      <Button onPress={handleSubmit(onNext)} style={tw`mt-8`}>
+        Next
+      </Button>
     </View>
   );
 }

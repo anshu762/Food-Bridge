@@ -4,7 +4,13 @@ import { AlertCircle, PackageOpen } from 'lucide-react-native';
 import { Button } from './Button';
 import tw from '../../utils/tw';
 
-export const Skeleton = ({ style }: { style?: ViewStyle }) => {
+export const Skeleton = ({
+  style,
+  variant = 'rect',
+}: {
+  style?: ViewStyle;
+  variant?: 'rect' | 'circle';
+}) => {
   const animValue = useRef(new Animated.Value(0.3)).current;
 
   useEffect(() => {
@@ -26,7 +32,12 @@ export const Skeleton = ({ style }: { style?: ViewStyle }) => {
 
   return (
     <Animated.View
-      style={[{ opacity: animValue }, tw`bg-gray-200 rounded-lg`, style]}
+      style={[
+        { opacity: animValue },
+        tw`bg-neutral-200`,
+        variant === 'circle' ? tw`rounded-pill` : tw`rounded-md`,
+        style,
+      ]}
     />
   );
 };
@@ -45,12 +56,12 @@ export const EmptyState = ({
   onAction?: () => void;
 }) => {
   return (
-    <View style={tw`flex-1 items-center justify-center p-6`}>
-      <View style={tw`h-20 w-20 rounded-full bg-gray-50 items-center justify-center mb-4`}>
-        <Icon size={40} color="#9CA3AF" />
+    <View style={tw`flex-1 items-center justify-center p-24`}>
+      <View style={tw`h-64 w-64 rounded-pill bg-neutral-50 items-center justify-center mb-16`}>
+        <Icon size={32} color="#9CA3AF" />
       </View>
-      <Text style={tw`text-xl font-semibold text-gray-900 text-center mb-2`}>{title}</Text>
-      {subtitle && <Text style={tw`text-base text-gray-500 text-center mb-6`}>{subtitle}</Text>}
+      <Text style={tw`text-h2 text-neutral-900 text-center mb-8`}>{title}</Text>
+      {subtitle && <Text style={tw`text-body text-neutral-600 text-center mb-24`}>{subtitle}</Text>}
       {actionLabel && onAction && (
         <Button variant="secondary" onPress={onAction}>
           {actionLabel}
@@ -62,14 +73,12 @@ export const EmptyState = ({
 
 export const ErrorState = ({ message, onRetry }: { message?: string; onRetry?: () => void }) => {
   return (
-    <View style={tw`flex-1 items-center justify-center p-6`}>
-      <View style={tw`h-20 w-20 rounded-full bg-red-50 items-center justify-center mb-4`}>
-        <AlertCircle size={40} color="#EF4444" />
+    <View style={tw`flex-1 items-center justify-center p-24`}>
+      <View style={tw`h-64 w-64 rounded-pill bg-danger/10 items-center justify-center mb-16`}>
+        <AlertCircle size={32} color="#D9432E" />
       </View>
-      <Text style={tw`text-xl font-semibold text-gray-900 text-center mb-2`}>
-        Something went wrong
-      </Text>
-      <Text style={tw`text-base text-gray-500 text-center mb-6`}>
+      <Text style={tw`text-h2 text-neutral-900 text-center mb-8`}>Something went wrong</Text>
+      <Text style={tw`text-body text-neutral-600 text-center mb-24`}>
         {message || 'We could not load this content. Please try again.'}
       </Text>
       {onRetry && (

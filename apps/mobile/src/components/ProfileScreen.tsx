@@ -1,14 +1,6 @@
 import { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  RefreshControl,
-  TextInput,
-} from 'react-native';
-import { showConfirm } from '../utils/confirm';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
+import { useUI } from './ui/Providers';
 import {
   User,
   Shield,
@@ -84,14 +76,14 @@ function VerificationBadge({ status }: { status: 'PENDING' | 'APPROVED' | 'REJEC
 
 function ProfileSkeleton() {
   return (
-    <View style={tw`p-6`}>
-      <View style={tw`items-center mb-8`}>
-        <Skeleton style={tw`h-20 w-20 rounded-full mb-3`} />
-        <Skeleton style={tw`h-5 w-40 mb-1`} />
-        <Skeleton style={tw`h-4 w-28`} />
+    <View style={tw`p-24`}>
+      <View style={tw`items-center mb-32`}>
+        <Skeleton style={tw`h-80 w-80 rounded-full mb-12`} />
+        <Skeleton style={tw`h-20 w-160 mb-4`} />
+        <Skeleton style={tw`h-16 w-112`} />
       </View>
       {[1, 2, 3, 4].map((i) => (
-        <Skeleton key={i} style={tw`h-14 w-full mb-3 rounded-xl`} />
+        <Skeleton key={i} style={tw`h-56 w-full mb-12 rounded-xl`} />
       ))}
     </View>
   );
@@ -99,6 +91,7 @@ function ProfileSkeleton() {
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
+  const { showToast, showDialog } = useUI();
   const { data: profile, isLoading, isError, refetch } = useProfile();
   const { mutateAsync: updateProfile, isPending: updating } = useUpdateProfile();
   const { mutateAsync: changePassword, isPending: changingPwd } = useChangePassword();
@@ -134,51 +127,51 @@ export default function ProfileScreen() {
 
   const handleChangePassword = useCallback(async () => {
     if (!currentPwd || !newPwd) {
-      Alert.alert('Error', 'Please fill in both fields');
+      showToast({ message: 'Please fill in both fields', type: 'error' });
       return;
     }
     if (newPwd.length < 8) {
-      Alert.alert('Error', 'New password must be at least 8 characters');
+      showToast({ message: 'New password must be at least 8 characters', type: 'error' });
       return;
     }
     try {
       await changePassword({ currentPassword: currentPwd, newPassword: newPwd });
-      Alert.alert('Success', 'Password changed successfully');
+      showToast({ message: 'Password changed successfully', type: 'success' });
       notifySuccess();
       setShowPasswordForm(false);
       setCurrentPwd('');
       setNewPwd('');
     } catch (err: any) {
       const msg = err?.response?.data?.error || 'Failed to change password';
-      Alert.alert('Error', msg);
+      showToast({ message: msg, type: 'error' });
     }
   }, [changePassword, currentPwd, newPwd]);
 
   const handleDeleteAccount = useCallback(() => {
-    showConfirm(
-      'Delete Account',
-      'This action is irreversible. Your account will be permanently deleted and all your personal information will be removed. Your past listings and requests will be anonymized to preserve community data.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete My Account',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteAccount();
-              await logout();
-            } catch {}
-          },
-        },
-      ],
-    );
+    showDialog({
+      title: 'Delete Account',
+      message:
+        'This action is irreversible. Your account will be permanently deleted and all your personal information will be removed. Your past listings and requests will be anonymized to preserve community data.',
+      cancelText: 'Cancel',
+      confirmText: 'Delete My Account',
+      type: 'destructive',
+      onConfirm: async () => {
+        try {
+          await deleteAccount();
+          await logout();
+        } catch {}
+      },
+    });
   }, [deleteAccount, logout]);
 
   const handleLogout = useCallback(() => {
-    showConfirm('Logout', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', onPress: () => logout() },
-    ]);
+    showDialog({
+      title: 'Logout',
+      message: 'Are you sure you want to log out?',
+      cancelText: 'Cancel',
+      confirmText: 'Logout',
+      onConfirm: () => logout(),
+    });
   }, [logout]);
 
   const handleUploadVerificationDoc = useCallback(async () => {
@@ -186,7 +179,11 @@ export default function ProfileScreen() {
     if (url) {
       try {
         await uploadDoc(url);
-        Alert.alert('Submitted', 'Your verification document has been uploaded for review.');
+        showDialog({
+          title: 'Submitted',
+          message: 'Your verification document has been uploaded for review.',
+          confirmText: 'OK',
+        });
       } catch {}
     }
   }, [pickAndUpload, uploadDoc]);
@@ -196,7 +193,11 @@ export default function ProfileScreen() {
     if (url) {
       try {
         await uploadDoc(url);
-        Alert.alert('Re-submitted', 'Your new verification document has been uploaded for review.');
+        showDialog({
+          title: 'Re-submitted',
+          message: 'Your new verification document has been uploaded for review.',
+          confirmText: 'OK',
+        });
       } catch {}
     }
   }, [pickAndUpload, uploadDoc]);
@@ -209,25 +210,25 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      style={tw`flex-1 bg-gray-50`}
-      contentContainerStyle={tw`p-6 pb-20`}
+      style={tw`flex-1 bg-neutral-50`}
+      contentContainerStyle={tw`p-16 pb-80`}
       refreshControl={<RefreshControl refreshing={false} onRefresh={() => refetch()} />}
     >
       {/* Profile Header */}
-      <View style={tw`items-center mb-8`}>
-        <View style={tw`h-20 w-20 rounded-full bg-primary-100 items-center justify-center mb-3`}>
-          <User size={36} color="#3B6D11" />
+      <View style={tw`items-center mb-32`}>
+        <View style={tw`h-80 w-80 rounded-full bg-primary-100 items-center justify-center mb-12`}>
+          <User size={36} color="#1B7A4D" />
         </View>
-        <Text style={tw`text-xl font-bold text-gray-900`}>{profile?.name || 'User'}</Text>
-        <Text style={tw`text-sm text-gray-500 mb-2`}>{profile?.email}</Text>
+        <Text style={tw`text-h2 text-neutral-900`}>{profile?.name || 'User'}</Text>
+        <Text style={tw`text-body text-neutral-500 mb-8`}>{profile?.email}</Text>
         <VerificationBadge status={verifStatus} />
       </View>
 
       {/* Edit Profile */}
-      <Card style={tw`p-5 mb-4`}>
+      <Card style={tw`p-16 mb-16 border-neutral-200 bg-surface`}>
         {editing ? (
           <>
-            <Text style={tw`text-base font-bold text-gray-900 mb-4`}>Edit Profile</Text>
+            <Text style={tw`text-h3 text-neutral-900 mb-16`}>Edit Profile</Text>
             <EditField
               label="Name"
               value={editName}
@@ -249,11 +250,11 @@ export default function ProfileScreen() {
                 placeholder="Organization name"
               />
             )}
-            <View style={tw`flex-row space-x-3`}>
-              <Button variant="ghost" onPress={() => setEditing(false)} style={tw`flex-1`}>
+            <View style={tw`flex-row space-x-12`}>
+              <Button variant="ghost" onPress={() => setEditing(false)} style={tw`flex-1 mr-8`}>
                 Cancel
               </Button>
-              <Button loading={updating} onPress={handleSaveProfile} style={tw`flex-1`}>
+              <Button loading={updating} onPress={handleSaveProfile} style={tw`flex-1 ml-8`}>
                 Save
               </Button>
             </View>
@@ -265,12 +266,14 @@ export default function ProfileScreen() {
             activeOpacity={0.7}
           >
             <View style={tw`flex-1`}>
-              <Text style={tw`text-base font-bold text-gray-900`}>
+              <Text style={tw`text-body-emphasis text-neutral-900`}>
                 {profile?.name || 'Add Name'}
               </Text>
-              <Text style={tw`text-sm text-gray-500`}>{profile?.phone || 'Add phone number'}</Text>
+              <Text style={tw`text-body text-neutral-500`}>
+                {profile?.phone || 'Add phone number'}
+              </Text>
               {profile?.orgName && (
-                <Text style={tw`text-xs text-gray-400 mt-0.5`}>{profile.orgName}</Text>
+                <Text style={tw`text-caption text-neutral-400 mt-2`}>{profile.orgName}</Text>
               )}
             </View>
             <ChevronRight size={18} color="#9CA3AF" />
@@ -280,10 +283,10 @@ export default function ProfileScreen() {
 
       {/* Verification Section */}
       {role === 'DONOR' && (
-        <Card style={tw`p-5 mb-4`}>
-          <View style={tw`flex-row items-center mb-3`}>
-            <Shield size={18} color="#3B6D11" />
-            <Text style={tw`text-base font-bold text-gray-900 ml-2`}>Verification</Text>
+        <Card style={tw`p-16 mb-16 border-neutral-200 bg-surface`}>
+          <View style={tw`flex-row items-center mb-12`}>
+            <Shield size={18} color="#1B7A4D" />
+            <Text style={tw`text-body-emphasis text-neutral-900 ml-8`}>Verification</Text>
           </View>
 
           {verifStatus === 'APPROVED' ? (
@@ -331,12 +334,12 @@ export default function ProfileScreen() {
       )}
 
       {/* Change Password */}
-      <Card style={tw`p-5 mb-4`}>
+      <Card style={tw`p-16 mb-16 border-neutral-200 bg-surface`}>
         {showPasswordForm ? (
           <>
-            <View style={tw`flex-row items-center mb-4`}>
-              <Lock size={18} color="#3B6D11" />
-              <Text style={tw`text-base font-bold text-gray-900 ml-2`}>Change Password</Text>
+            <View style={tw`flex-row items-center mb-16`}>
+              <Lock size={18} color="#1B7A4D" />
+              <Text style={tw`text-body-emphasis text-neutral-900 ml-8`}>Change Password</Text>
             </View>
             <EditField
               label="Current Password"
@@ -350,11 +353,15 @@ export default function ProfileScreen() {
               onChangeText={setNewPwd}
               placeholder="Min 8 characters"
             />
-            <View style={tw`flex-row space-x-3`}>
-              <Button variant="ghost" onPress={() => setShowPasswordForm(false)} style={tw`flex-1`}>
+            <View style={tw`flex-row space-x-12`}>
+              <Button
+                variant="ghost"
+                onPress={() => setShowPasswordForm(false)}
+                style={tw`flex-1 mr-8`}
+              >
                 Cancel
               </Button>
-              <Button loading={changingPwd} onPress={handleChangePassword} style={tw`flex-1`}>
+              <Button loading={changingPwd} onPress={handleChangePassword} style={tw`flex-1 ml-8`}>
                 Update
               </Button>
             </View>
@@ -365,18 +372,18 @@ export default function ProfileScreen() {
             onPress={() => setShowPasswordForm(true)}
             activeOpacity={0.7}
           >
-            <Lock size={18} color="#3B6D11" />
-            <Text style={tw`text-base font-bold text-gray-900 ml-2 flex-1`}>Change Password</Text>
+            <Lock size={18} color="#1B7A4D" />
+            <Text style={tw`text-body-emphasis text-neutral-900 ml-8 flex-1`}>Change Password</Text>
             <ChevronRight size={18} color="#9CA3AF" />
           </TouchableOpacity>
         )}
       </Card>
 
       {/* Logout */}
-      <Button variant="danger" onPress={handleLogout} fullWidth style={tw`mb-3`}>
+      <Button variant="danger" onPress={handleLogout} fullWidth style={tw`mb-12`}>
         <View style={tw`flex-row items-center`}>
           <LogOut size={18} color="#ffffff" />
-          <Text style={tw`text-white font-semibold ml-2`}>Log Out</Text>
+          <Text style={tw`text-white font-semibold ml-8`}>Log Out</Text>
         </View>
       </Button>
 
@@ -386,11 +393,11 @@ export default function ProfileScreen() {
         fullWidth
         loading={deleting}
         onPress={handleDeleteAccount}
-        style={tw`border-red-200`}
+        style={tw`border-danger/20`}
       >
         <View style={tw`flex-row items-center`}>
-          <Trash2 size={18} color="#EF4444" />
-          <Text style={tw`text-red-500 font-semibold ml-2`}>Delete Account</Text>
+          <Trash2 size={18} color="#D9432E" />
+          <Text style={tw`text-danger font-semibold ml-8`}>Delete Account</Text>
         </View>
       </Button>
     </ScrollView>

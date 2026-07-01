@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text } from 'react-native';
 import * as Location from 'expo-location';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { ErrorState } from '../ui/Feedback';
+import { useUI } from '../ui/Providers';
 import tw from '../../utils/tw';
 
 interface Step4FormData {
@@ -19,33 +21,36 @@ interface Props {
 }
 
 export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
+  const { showToast } = useUI();
+  const [gpsError, setGpsError] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
-    initialData.pickupLat && initialData.pickupLng 
-      ? { lat: initialData.pickupLat, lng: initialData.pickupLng } 
-      : null
+    initialData.pickupLat && initialData.pickupLng
+      ? { lat: initialData.pickupLat, lng: initialData.pickupLng }
+      : null,
   );
   const [address, setAddress] = useState(initialData.pickupAddress || '');
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!location) {
+    if (!location && !gpsError) {
       (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          // Fallback location if permission denied (e.g., center of a generic city)
-          setLocation({ lat: 37.7749, lng: -122.4194 });
+          setGpsError(true);
           return;
         }
 
         let currentLocation = await Location.getCurrentPositionAsync({});
-        setLocation({ lat: currentLocation.coords.latitude, lng: currentLocation.coords.longitude });
+        setLocation({
+          lat: currentLocation.coords.latitude,
+          lng: currentLocation.coords.longitude,
+        });
       })();
     }
   }, []);
 
   const handleNext = () => {
     if (!location || !address.trim()) {
-      Alert.alert('Missing Info', 'Please provide a valid address and location pin.');
+      showToast({ message: 'Please provide a valid address and location pin.', type: 'error' });
       return;
     }
     onNext({
@@ -55,12 +60,14 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
     });
   };
 
-  const initialRegion: Region | undefined = location ? {
-    latitude: location.lat,
-    longitude: location.lng,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  } : undefined;
+  const initialRegion: Region | undefined = location
+    ? {
+        latitude: location.lat,
+        longitude: location.lng,
+        latitudeDelta: 0.05,
+        longitudeDelta: 0.05,
+      }
+    : undefined;
 
   return (
     <View style={tw`flex-1 space-y-4`}>
@@ -73,39 +80,64 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
         onChangeText={setAddress}
       />
 
-      <View style={tw`flex-1 rounded-xl overflow-hidden border border-gray-300 mt-2`}>
-        {location ? (
+      <View style={tw`flex-1 rounded-xl overflow-hidden border border-neutral-200 mt-8`}>
+        {gpsError ? (
+          <ErrorState
+            message="GPS permission was denied. We need your location to pin the pickup point."
+            onRetry={async () => {
+              let { status } = await Location.requestForegroundPermissionsAsync();
+              if (status === 'granted') {
+                setGpsError(false);
+                let currentLocation = await Location.getCurrentPositionAsync({});
+                setLocation({
+                  lat: currentLocation.coords.latitude,
+                  lng: currentLocation.coords.longitude,
+                });
+              }
+            }}
+          />
+        ) : location ? (
           <MapView
             style={{ flex: 1 }}
             initialRegion={initialRegion}
-            onPress={(e) => setLocation({ 
-              lat: e.nativeEvent.coordinate.latitude, 
-              lng: e.nativeEvent.coordinate.longitude 
-            })}
+            onPress={(e) =>
+              setLocation({
+                lat: e.nativeEvent.coordinate.latitude,
+                lng: e.nativeEvent.coordinate.longitude,
+              })
+            }
           >
-            <Marker 
+            <Marker
               coordinate={{ latitude: location.lat, longitude: location.lng }}
               draggable
-              onDragEnd={(e) => setLocation({ 
-                lat: e.nativeEvent.coordinate.latitude, 
-                lng: e.nativeEvent.coordinate.longitude 
-              })}
+              onDragEnd={(e) =>
+                setLocation({
+                  lat: e.nativeEvent.coordinate.latitude,
+                  lng: e.nativeEvent.coordinate.longitude,
+                })
+              }
             />
           </MapView>
         ) : (
-          <View style={tw`flex-1 items-center justify-center bg-gray-100`}>
-            <Text style={tw`text-gray-500`}>Loading map...</Text>
+          <View style={tw`flex-1 items-center justify-center bg-neutral-50`}>
+            <Text style={tw`text-neutral-500`}>Loading map...</Text>
           </View>
         )}
       </View>
-      <Text style={tw`text-xs text-gray-500 text-center mb-2`}>You can drag the pin or tap to adjust the exact location.</Text>
+      <Text style={tw`text-xs text-gray-500 text-center mb-2`}>
+        You can drag the pin or tap to adjust the exact location.
+      </Text>
 
       <View style={tw`flex-row space-x-4 mt-auto`}>
         <View style={tw`flex-1`}>
-          <Button variant="ghost" onPress={onBack}>Back</Button>
+          <Button variant="ghost" onPress={onBack}>
+            Back
+          </Button>
         </View>
         <View style={tw`flex-1`}>
-          <Button onPress={handleNext} disabled={!address || !location}>Next</Button>
+          <Button onPress={handleNext} disabled={!address || !location}>
+            Next
+          </Button>
         </View>
       </View>
     </View>

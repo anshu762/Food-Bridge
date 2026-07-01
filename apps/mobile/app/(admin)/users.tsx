@@ -5,6 +5,7 @@ import { Skeleton, ErrorState, EmptyState } from '../../src/components/ui/Feedba
 import { Users, Search, CheckCircle, XCircle, Clock } from 'lucide-react-native';
 import tw from '../../src/utils/tw';
 import { formatDistanceToNow } from 'date-fns';
+import { TouchableCard, Card } from '../../src/components/ui/Card';
 
 export default function UsersScreen() {
   const [search, setSearch] = useState('');
@@ -35,70 +36,70 @@ export default function UsersScreen() {
     switch (status) {
       case 'APPROVED':
         return (
-          <View style={tw`flex-row items-center bg-green-100 px-2 py-1 rounded-full`}>
-            <CheckCircle size={12} color="#15803d" />
-            <Text style={tw`text-green-800 text-xs font-semibold ml-1`}>Verified</Text>
+          <View style={tw`flex-row items-center bg-primary-50 px-8 py-4 rounded-pill`}>
+            <CheckCircle size={12} color="#1B7A4D" />
+            <Text style={tw`text-primary-800 text-caption font-semibold ml-4`}>Verified</Text>
           </View>
         );
       case 'PENDING':
         return (
-          <View style={tw`flex-row items-center bg-yellow-100 px-2 py-1 rounded-full`}>
-            <Clock size={12} color="#a16207" />
-            <Text style={tw`text-yellow-800 text-xs font-semibold ml-1`}>Pending</Text>
+          <View style={tw`flex-row items-center bg-warning/10 px-8 py-4 rounded-pill`}>
+            <Clock size={12} color="#D97706" />
+            <Text style={tw`text-warning text-caption font-semibold ml-4`}>Pending</Text>
           </View>
         );
       case 'REJECTED':
         return (
-          <View style={tw`flex-row items-center bg-red-100 px-2 py-1 rounded-full`}>
-            <XCircle size={12} color="#b91c1c" />
-            <Text style={tw`text-red-800 text-xs font-semibold ml-1`}>Rejected</Text>
+          <View style={tw`flex-row items-center bg-danger/10 px-8 py-4 rounded-pill`}>
+            <XCircle size={12} color="#D9432E" />
+            <Text style={tw`text-danger text-caption font-semibold ml-4`}>Rejected</Text>
           </View>
         );
       default:
         return (
-          <View style={tw`flex-row items-center bg-slate-100 px-2 py-1 rounded-full`}>
-            <Text style={tw`text-slate-600 text-xs font-semibold`}>Unverified</Text>
+          <View style={tw`flex-row items-center bg-neutral-100 px-8 py-4 rounded-pill`}>
+            <Text style={tw`text-neutral-600 text-caption font-semibold`}>Unverified</Text>
           </View>
         );
     }
   };
 
   return (
-    <View style={tw`flex-1 bg-slate-50`}>
-      <View style={tw`bg-white px-4 py-3 border-b border-slate-200 z-10`}>
-        <View style={tw`flex-row items-center bg-slate-100 rounded-xl px-3 h-10 mb-3`}>
-          <Search size={18} color="#64748b" />
+    <View style={tw`flex-1 bg-neutral-50`}>
+      <View style={tw`bg-surface px-16 py-12 border-b border-neutral-200 z-10`}>
+        <View style={tw`flex-row items-center bg-neutral-100 rounded-md px-12 h-40 mb-12`}>
+          <Search size={18} color="#9CA3AF" />
           <TextInput
-            style={tw`flex-1 ml-2 text-slate-900 text-sm`}
+            style={tw`flex-1 ml-8 text-neutral-900 text-body`}
             placeholder="Search users by name, email, or org..."
-            placeholderTextColor="#94a3b8"
+            placeholderTextColor="#9CA3AF"
             value={search}
             onChangeText={setSearch}
           />
           {search.length > 0 && (
             <TouchableOpacity onPress={() => setSearch('')}>
-              <XCircle size={18} color="#94a3b8" />
+              <XCircle size={18} color="#9CA3AF" />
             </TouchableOpacity>
           )}
         </View>
 
         <View style={tw`flex-row`}>
           <TouchableOpacity
-            style={tw`px-3 py-1.5 rounded-full border ${filterRole === 'DONOR' ? 'bg-slate-800 border-slate-800' : 'bg-white border-slate-300'} mr-2`}
+            style={tw`px-12 py-6 rounded-pill border ${filterRole === 'DONOR' ? 'bg-primary border-primary' : 'bg-surface border-neutral-200'} mr-8`}
             onPress={() => setFilterRole(filterRole === 'DONOR' ? undefined : 'DONOR')}
           >
             <Text
-              style={tw`text-xs font-semibold ${filterRole === 'DONOR' ? 'text-white' : 'text-slate-600'}`}
+              style={tw`text-caption font-semibold ${filterRole === 'DONOR' ? 'text-white' : 'text-neutral-600'}`}
             >
               Donors
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={tw`px-3 py-1.5 rounded-full border ${filterRole === 'RECEIVER' ? 'bg-slate-800 border-slate-800' : 'bg-white border-slate-300'} mr-2`}
+            style={tw`px-12 py-6 rounded-pill border ${filterRole === 'RECEIVER' ? 'bg-primary border-primary' : 'bg-surface border-neutral-200'} mr-8`}
             onPress={() => setFilterRole(filterRole === 'RECEIVER' ? undefined : 'RECEIVER')}
           >
             <Text
-              style={tw`text-xs font-semibold ${filterRole === 'RECEIVER' ? 'text-white' : 'text-slate-600'}`}
+              style={tw`text-caption font-semibold ${filterRole === 'RECEIVER' ? 'text-white' : 'text-neutral-600'}`}
             >
               Receivers
             </Text>
@@ -107,18 +108,18 @@ export default function UsersScreen() {
       </View>
 
       {isLoading && !isRefetching ? (
-        <View style={tw`p-4`}>
+        <View style={tw`p-16`}>
           {[1, 2, 3, 4, 5].map((i) => (
-            <View
+            <Card
               key={i}
-              style={tw`bg-white rounded-xl p-4 mb-3 border border-slate-100 flex-row items-center`}
+              style={tw`mb-12 border border-neutral-100 flex-row items-center bg-surface p-16`}
             >
-              <Skeleton style={tw`w-12 h-12 rounded-full mr-4`} />
+              <Skeleton style={tw`w-48 h-48 rounded-full mr-16`} />
               <View style={tw`flex-1`}>
-                <Skeleton style={tw`h-5 w-3/4 mb-2`} />
-                <Skeleton style={tw`h-4 w-1/2`} />
+                <Skeleton style={tw`h-20 w-3/4 mb-8`} />
+                <Skeleton style={tw`h-16 w-1/2`} />
               </View>
-            </View>
+            </Card>
           ))}
         </View>
       ) : isError ? (
@@ -130,8 +131,10 @@ export default function UsersScreen() {
         <FlatList
           data={users}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={tw`p-4 ${users.length === 0 ? 'flex-1' : ''}`}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} />}
+          contentContainerStyle={tw`p-16 ${users.length === 0 ? 'flex-1' : ''}`}
+          refreshControl={
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#1B7A4D" />
+          }
           ListEmptyComponent={
             <EmptyState
               title="No users found"
@@ -150,40 +153,46 @@ export default function UsersScreen() {
           onEndReachedThreshold={0.5}
           ListFooterComponent={
             isFetchingNextPage ? (
-              <View style={tw`py-4 items-center`}>
-                <Text style={tw`text-slate-500`}>Loading more users...</Text>
+              <View style={tw`py-16 items-center`}>
+                <Text style={tw`text-neutral-500`}>Loading more users...</Text>
               </View>
             ) : null
           }
           renderItem={({ item }) => (
-            <TouchableOpacity
-              style={tw`bg-white rounded-xl p-4 mb-3 border border-slate-200 flex-row items-center shadow-sm`}
+            <TouchableCard
+              style={tw`mb-12 border border-neutral-200 bg-surface`}
+              onPress={() => {}}
             >
-              <View
-                style={tw`w-12 h-12 rounded-full bg-slate-100 items-center justify-center mr-4`}
-              >
-                <Text style={tw`text-lg font-bold text-slate-500`}>
-                  {item.name?.charAt(0).toUpperCase() || 'U'}
-                </Text>
-              </View>
-              <View style={tw`flex-1`}>
-                <View style={tw`flex-row justify-between items-start`}>
-                  <Text style={tw`text-base font-bold text-slate-900`} numberOfLines={1}>
-                    {item.name || 'Anonymous User'}
-                  </Text>
-                  {renderStatusBadge(item.verificationStatus)}
-                </View>
-                <Text style={tw`text-slate-500 text-sm`} numberOfLines={1}>
-                  {item.email}
-                </Text>
-                <View style={tw`flex-row mt-1 justify-between items-center`}>
-                  <Text style={tw`text-slate-400 text-xs`}>{item.role}</Text>
-                  <Text style={tw`text-slate-400 text-xs`}>
-                    Joined {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+              <View style={tw`flex-row items-center p-16`}>
+                <View
+                  style={tw`w-48 h-48 rounded-full bg-neutral-100 items-center justify-center mr-16`}
+                >
+                  <Text style={tw`text-h3 font-bold text-neutral-500`}>
+                    {item.name?.charAt(0).toUpperCase() || 'U'}
                   </Text>
                 </View>
+                <View style={tw`flex-1`}>
+                  <View style={tw`flex-row justify-between items-start`}>
+                    <Text
+                      style={tw`text-body-emphasis text-neutral-900 flex-1 mr-8`}
+                      numberOfLines={1}
+                    >
+                      {item.name || 'Anonymous User'}
+                    </Text>
+                    {renderStatusBadge(item.verificationStatus)}
+                  </View>
+                  <Text style={tw`text-neutral-500 text-body mt-4`} numberOfLines={1}>
+                    {item.email}
+                  </Text>
+                  <View style={tw`flex-row mt-4 justify-between items-center`}>
+                    <Text style={tw`text-neutral-400 text-caption`}>{item.role}</Text>
+                    <Text style={tw`text-neutral-400 text-caption`}>
+                      Joined {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                    </Text>
+                  </View>
+                </View>
               </View>
-            </TouchableOpacity>
+            </TouchableCard>
           )}
         />
       )}

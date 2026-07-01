@@ -8,7 +8,7 @@ import { ControlledInput } from '../../src/components/ui/Input';
 import { Button } from '../../src/components/ui/Button';
 import { useAuthStore } from '../../src/store/authStore';
 import { api } from '../../src/services/api';
-import { useToast } from '../../src/components/ui/Toast';
+import { useUI } from '../../src/components/ui/Providers';
 import { useNetworkStatus } from '../../src/hooks/useNetworkStatus';
 import { registerForPushNotifications } from '../../src/utils/notifications';
 import { z } from 'zod';
@@ -19,7 +19,7 @@ type LoginForm = z.infer<typeof loginSchema>;
 export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuthStore();
-  const { showToast } = useToast();
+  const { showToast } = useUI();
   const { isOnline } = useNetworkStatus();
 
   const { control, handleSubmit } = useForm<LoginForm>({
@@ -56,12 +56,12 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={tw`flex-1 bg-white`}
+      style={tw`flex-1 bg-surface`}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 24 }}>
-        <View style={tw`mb-8 items-center`}>
-          <Text style={tw`text-3xl font-bold text-primary-600 mb-2`}>Welcome Back</Text>
-          <Text style={tw`text-gray-500 text-center text-base`}>
+        <View style={tw`mb-32 items-center`}>
+          <Text style={tw`text-display text-primary-dark mb-8`}>Welcome Back</Text>
+          <Text style={tw`text-body text-neutral-600 text-center`}>
             Log in to continue your journey with Food Bridge.
           </Text>
         </View>
@@ -84,14 +84,14 @@ export default function LoginScreen() {
           secureTextEntry
         />
 
-        <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading}>
+        <Button fullWidth onPress={handleSubmit(onSubmit)} loading={isLoading} style={tw`mt-16`}>
           Log In
         </Button>
 
-        <View style={tw`flex-row justify-center mt-6`}>
-          <Text style={tw`text-gray-500`}>Don't have an account? </Text>
+        <View style={tw`flex-row justify-center mt-24`}>
+          <Text style={tw`text-body text-neutral-600`}>Don't have an account? </Text>
           <Text
-            style={tw`text-primary-600 font-semibold`}
+            style={tw`text-body-emphasis text-primary`}
             onPress={() => router.push('/(auth)/register')}
           >
             Sign Up

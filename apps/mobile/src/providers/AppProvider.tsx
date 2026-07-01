@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ToastProvider, useToast } from '../components/ui/Toast';
+import { UIProvider, useToast } from '../components/ui/Providers';
 
 // Setup React Query client with sane defaults
 const queryClient = new QueryClient({
@@ -41,10 +41,10 @@ const QueryWrapper = ({ children }: { children: ReactNode }) => {
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <ToastProvider>
+    <UIProvider>
       <QueryClientProvider client={queryClient}>
         <QueryWrapper>{children}</QueryWrapper>
       </QueryClientProvider>
-    </ToastProvider>
+    </UIProvider>
   );
 };
