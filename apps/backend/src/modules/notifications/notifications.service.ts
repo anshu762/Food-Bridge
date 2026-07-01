@@ -1,8 +1,21 @@
 import { PrismaClient } from '@prisma/client';
-import { Expo } from 'expo-server-sdk';
 
 const prisma = new PrismaClient();
-const expo = new Expo();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let expoInstance: any = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let ExpoClass: any = null;
+
+const getExpo = async () => {
+  if (!expoInstance) {
+    // Dynamic import to bypass TypeScript's require() conversion
+    // This safely loads the ESM module inside a CommonJS file
+    const module = await Function('return import("expo-server-sdk")')();
+    ExpoClass = module.Expo;
+    expoInstance = new ExpoClass();
+  }
+  return { expo: expoInstance, Expo: ExpoClass };
+};
 
 export const createNotification = async (
   userId: string,
@@ -26,20 +39,23 @@ export const createNotification = async (
       },
     });
 
-    if (notification.user.expoPushToken && Expo.isExpoPushToken(notification.user.expoPushToken)) {
-      try {
-        await expo.sendPushNotificationsAsync([
-          {
-            to: notification.user.expoPushToken,
-            sound: 'default',
-            title,
-            body: message,
-            data,
-          },
-        ]);
-      } catch (pushError) {
-        console.error('Expo push error:', pushError);
-        // Do not throw, just log
+    if (notification.user.expoPushToken) {
+      const { expo, Expo } = await getExpo();
+      if (Expo.isExpoPushToken(notification.user.expoPushToken)) {
+        try {
+          await expo.sendPushNotificationsAsync([
+            {
+              to: notification.user.expoPushToken,
+              sound: 'default',
+              title,
+              body: message,
+              data,
+            },
+          ]);
+        } catch (pushError) {
+          console.error('Expo push error:', pushError);
+          // Do not throw, just log
+        }
       }
     }
 
