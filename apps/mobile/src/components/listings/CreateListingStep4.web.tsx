@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import * as Location from 'expo-location';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { ErrorState } from '../ui/Feedback';
 import { useUI } from '../ui/Providers';
 import tw from '../../utils/tw';
 
@@ -20,6 +21,7 @@ interface Props {
 
 export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
   const { showToast } = useUI();
+  const [gpsError, setGpsError] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     initialData.pickupLat && initialData.pickupLng
       ? { lat: initialData.pickupLat, lng: initialData.pickupLng }
@@ -28,12 +30,12 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
   const [address, setAddress] = useState(initialData.pickupAddress || '');
 
   useEffect(() => {
-    if (!location) {
+    if (!location && !gpsError) {
       (async () => {
         try {
           let { status } = await Location.requestForegroundPermissionsAsync();
           if (status !== 'granted') {
-            setLocation({ lat: 37.7749, lng: -122.4194 });
+            setGpsError(true);
             return;
           }
 
@@ -43,7 +45,7 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
             lng: currentLocation.coords.longitude,
           });
         } catch (error) {
-          setLocation({ lat: 37.7749, lng: -122.4194 });
+          setGpsError(true);
         }
       })();
     }
@@ -73,16 +75,37 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
       />
 
       <View
-        style={tw`flex-1 rounded-xl overflow-hidden border border-gray-300 mt-2 bg-gray-100 items-center justify-center p-4`}
+        style={tw`flex-1 rounded-xl overflow-hidden border border-neutral-200 mt-8 bg-neutral-50 items-center justify-center p-16`}
       >
-        <Text style={tw`text-gray-600 font-medium text-center mb-2`}>
-          Interactive Map is disabled on Web
-        </Text>
-        <Text style={tw`text-gray-500 text-sm text-center`}>
-          {location
-            ? `Location acquired: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
-            : 'Acquiring location...'}
-        </Text>
+        {gpsError ? (
+          <ErrorState
+            message="GPS permission was denied. We need your location to pin the pickup point."
+            onRetry={async () => {
+              try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status === 'granted') {
+                  setGpsError(false);
+                  let currentLocation = await Location.getCurrentPositionAsync({});
+                  setLocation({
+                    lat: currentLocation.coords.latitude,
+                    lng: currentLocation.coords.longitude,
+                  });
+                }
+              } catch (e) {}
+            }}
+          />
+        ) : (
+          <>
+            <Text style={tw`text-body-emphasis text-neutral-600 text-center mb-8`}>
+              Interactive Map is disabled on Web
+            </Text>
+            <Text style={tw`text-caption text-neutral-500 text-center`}>
+              {location
+                ? `Location acquired: ${location.lat.toFixed(4)}, ${location.lng.toFixed(4)}`
+                : 'Acquiring location...'}
+            </Text>
+          </>
+        )}
       </View>
 
       <Text style={tw`text-xs text-gray-500 text-center mb-2`}>

@@ -18,10 +18,10 @@ interface Props {
 
 export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
   const [preparedAt, setPreparedAt] = useState<Date>(
-    initialData.preparedAt ? new Date(initialData.preparedAt) : new Date()
+    initialData.preparedAt ? new Date(initialData.preparedAt) : new Date(),
   );
   const [safeUntil, setSafeUntil] = useState<Date>(
-    initialData.safeUntil ? new Date(initialData.safeUntil) : new Date(Date.now() + 3600000)
+    initialData.safeUntil ? new Date(initialData.safeUntil) : new Date(Date.now() + 3600000),
   );
 
   const [showPreparedPicker, setShowPreparedPicker] = useState(false);
@@ -50,18 +50,18 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
   };
 
   return (
-    <View style={tw`flex-1 space-y-6`}>
-      <Text style={tw`text-lg font-bold text-gray-900 mb-2`}>When was this prepared?</Text>
+    <View style={tw`flex-1 space-y-16`}>
+      <Text style={tw`text-h3 text-neutral-900 mb-8`}>When was this prepared?</Text>
 
-      {error ? <Text style={tw`text-red-500 font-medium mb-4`}>{error}</Text> : null}
+      {error ? <Text style={tw`text-caption text-danger font-medium mb-16`}>{error}</Text> : null}
 
-      <View style={tw`space-y-2`}>
-        <Text style={tw`text-sm font-medium text-gray-700`}>Prepared At</Text>
+      <View style={tw`mb-16 w-full`}>
+        <Text style={tw`mb-8 text-body-emphasis text-neutral-900`}>Prepared At</Text>
         <TouchableOpacity
           onPress={() => setShowPreparedPicker(true)}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-gray-50`}
+          style={tw`w-full rounded-md border border-neutral-200 bg-neutral-50 px-16 py-12 flex-row justify-between items-center`}
         >
-          <Text>{format(preparedAt, 'PPp')}</Text>
+          <Text style={tw`text-body text-neutral-900`}>{format(preparedAt, 'PPp')}</Text>
         </TouchableOpacity>
         {showPreparedPicker && (
           <DateTimePicker
@@ -77,13 +77,13 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
         )}
       </View>
 
-      <View style={tw`space-y-2`}>
-        <Text style={tw`text-sm font-medium text-gray-700`}>Safe Until</Text>
+      <View style={tw`mb-16 w-full`}>
+        <Text style={tw`mb-8 text-body-emphasis text-neutral-900`}>Safe Until</Text>
         <TouchableOpacity
           onPress={() => setShowSafePicker(true)}
-          style={tw`border border-gray-300 rounded-lg p-3 bg-gray-50`}
+          style={tw`w-full rounded-md border border-neutral-200 bg-neutral-50 px-16 py-12 flex-row justify-between items-center`}
         >
-          <Text>{format(safeUntil, 'PPp')}</Text>
+          <Text style={tw`text-body text-neutral-900`}>{format(safeUntil, 'PPp')}</Text>
         </TouchableOpacity>
         {showSafePicker && (
           <DateTimePicker
@@ -101,7 +101,9 @@ export function CreateListingStep2({ initialData, onNext, onBack }: Props) {
 
       <View style={tw`flex-row space-x-4 mt-8`}>
         <View style={tw`flex-1`}>
-          <Button variant="ghost" onPress={onBack}>Back</Button>
+          <Button variant="ghost" onPress={onBack}>
+            Back
+          </Button>
         </View>
         <View style={tw`flex-1`}>
           <Button onPress={handleNext}>Next</Button>

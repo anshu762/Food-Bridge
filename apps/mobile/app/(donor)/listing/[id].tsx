@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { View, Text, ScrollView, Image, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams, useRouter, useFocusEffect } from 'expo-router';
 import { useListing, useCancelListing } from '../../../src/hooks/useListings';
 import { useApproveRequest, useRejectRequest } from '../../../src/hooks/useRequests';
 import { Button } from '../../../src/components/ui/Button';
+import { Card } from '../../../src/components/ui/Card';
 import { Badge } from '../../../src/components/ui/Badge';
 import { ErrorState } from '../../../src/components/ui/Feedback';
 import { useUI } from '../../../src/components/ui/Providers';
@@ -30,6 +31,15 @@ export default function ListingDetail() {
       setRaceConditionError(null);
     }, [refetch]),
   );
+
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleCancelListing = () => {
     showDialog({
@@ -140,6 +150,10 @@ export default function ListingDetail() {
     (req: any) => req.status === 'ACCEPTED' || req.status === 'COLLECTED',
   );
 
+  const safeUntilDate = new Date(listing.safeUntil);
+  const isExpiredLocally = isAvailable && safeUntilDate <= now;
+  const displayStatus = isExpiredLocally ? 'EXPIRED' : listing.status;
+
   return (
     <View style={tw`flex-1 bg-gray-50`}>
       <View style={tw`bg-white border-b border-gray-100 flex-row items-center px-4 py-3`}>
@@ -149,7 +163,7 @@ export default function ListingDetail() {
         <Text style={tw`text-lg font-bold text-gray-900 flex-1`} numberOfLines={1}>
           {listing.title}
         </Text>
-        <Badge status={listing.status} />
+        <Badge status={displayStatus} />
       </View>
 
       <ScrollView style={tw`flex-1`}>
@@ -223,15 +237,22 @@ export default function ListingDetail() {
             <View style={tw`space-y-4`}>
               {requests.map((req: any) => {
                 const isPending = req.status === 'PENDING';
+                const isResolvedWinner = req.status === 'ACCEPTED' || req.status === 'COLLECTED';
                 const showDisabled = isPending && hasApprovedRequest;
 
                 return (
-                  <View
+                  <Card
                     key={req.id}
-                    style={tw`p-4 rounded-xl border ${showDisabled ? 'border-gray-100 bg-gray-50 opacity-60' : 'border-gray-200 bg-white'}`}
+                    style={[
+                      tw`p-16 mb-16`,
+                      showDisabled ? tw`opacity-50` : tw``,
+                      isResolvedWinner
+                        ? tw`border-primary-500 bg-primary-50`
+                        : tw`border-neutral-200 bg-surface`,
+                    ]}
                   >
-                    <View style={tw`flex-row justify-between items-center mb-2`}>
-                      <Text style={tw`font-bold text-gray-900`}>
+                    <View style={tw`flex-row justify-between items-center mb-8`}>
+                      <Text style={tw`text-body-emphasis text-neutral-900`}>
                         {req.receiver?.email || 'Receiver'}
                       </Text>
                       {showDisabled ? (
@@ -240,12 +261,23 @@ export default function ListingDetail() {
                         <Badge status={req.status} />
                       )}
                     </View>
-                    <Text style={tw`text-xs text-gray-500 mb-3`}>
+                    <Text style={tw`text-caption text-neutral-500 mb-12`}>
                       Requested {format(new Date(req.createdAt), 'PPp')}
                     </Text>
                     {req.message ? (
-                      <Text style={tw`text-sm text-gray-700 mb-3 italic`}>"{req.message}"</Text>
+                      <Text style={tw`text-body text-neutral-700 mb-12 italic`}>
+                        "{req.message}"
+                      </Text>
                     ) : null}
+
+                    {isResolvedWinner && (
+                      <View style={tw`mt-8 p-12 bg-primary-100 rounded-md flex-row items-center`}>
+                        <Info color="#1B7A4D" size={16} style={tw`mr-8`} />
+                        <Text style={tw`text-caption text-primary-800`}>
+                          This request was chosen. Coordinate pickup with the receiver.
+                        </Text>
+                      </View>
+                    )}
 
                     {isPending && !hasApprovedRequest && (
                       <View style={tw`flex-row space-x-2 mt-2`}>
@@ -272,7 +304,7 @@ export default function ListingDetail() {
                         </View>
                       </View>
                     )}
-                  </View>
+                  </Card>
                 );
               })}
             </View>

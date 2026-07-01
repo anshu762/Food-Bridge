@@ -4,6 +4,7 @@ import * as Location from 'expo-location';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
+import { ErrorState } from '../ui/Feedback';
 import { useUI } from '../ui/Providers';
 import tw from '../../utils/tw';
 
@@ -21,6 +22,7 @@ interface Props {
 
 export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
   const { showToast } = useUI();
+  const [gpsError, setGpsError] = useState(false);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(
     initialData.pickupLat && initialData.pickupLng
       ? { lat: initialData.pickupLat, lng: initialData.pickupLng }
@@ -29,12 +31,11 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
   const [address, setAddress] = useState(initialData.pickupAddress || '');
 
   useEffect(() => {
-    if (!location) {
+    if (!location && !gpsError) {
       (async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          // Fallback location if permission denied (e.g., center of a generic city)
-          setLocation({ lat: 37.7749, lng: -122.4194 });
+          setGpsError(true);
           return;
         }
 
@@ -79,8 +80,23 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
         onChangeText={setAddress}
       />
 
-      <View style={tw`flex-1 rounded-xl overflow-hidden border border-gray-300 mt-2`}>
-        {location ? (
+      <View style={tw`flex-1 rounded-xl overflow-hidden border border-neutral-200 mt-8`}>
+        {gpsError ? (
+          <ErrorState
+            message="GPS permission was denied. We need your location to pin the pickup point."
+            onRetry={async () => {
+              let { status } = await Location.requestForegroundPermissionsAsync();
+              if (status === 'granted') {
+                setGpsError(false);
+                let currentLocation = await Location.getCurrentPositionAsync({});
+                setLocation({
+                  lat: currentLocation.coords.latitude,
+                  lng: currentLocation.coords.longitude,
+                });
+              }
+            }}
+          />
+        ) : location ? (
           <MapView
             style={{ flex: 1 }}
             initialRegion={initialRegion}
@@ -103,8 +119,8 @@ export function CreateListingStep4({ initialData, onNext, onBack }: Props) {
             />
           </MapView>
         ) : (
-          <View style={tw`flex-1 items-center justify-center bg-gray-100`}>
-            <Text style={tw`text-gray-500`}>Loading map...</Text>
+          <View style={tw`flex-1 items-center justify-center bg-neutral-50`}>
+            <Text style={tw`text-neutral-500`}>Loading map...</Text>
           </View>
         )}
       </View>

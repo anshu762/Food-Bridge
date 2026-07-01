@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, FlatList, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useInfiniteMyListings } from '../../src/hooks/useListings';
 import { TouchableCard } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
 import { differenceInHours, differenceInMinutes, formatDistanceToNowStrict } from 'date-fns';
-import { ErrorState, EmptyState } from '../../src/components/ui/Feedback';
+import { Tabs } from '../../src/components/ui/Tabs';
+import { ErrorState, EmptyState, Skeleton } from '../../src/components/ui/Feedback';
 import tw from '../../src/utils/tw';
 
 const TABS = ['ALL', 'AVAILABLE', 'RESERVED', 'COLLECTED', 'EXPIRED', 'CANCELLED'];
@@ -73,67 +66,65 @@ export default function MyListings() {
 
     return (
       <TouchableCard
-        style={tw`mb-4 flex-row items-center p-3`}
+        style={tw`mb-16 flex-row items-center p-12`}
         onPress={() => router.push(`/(donor)/listing/${item.id}` as any)}
       >
-        <Image source={{ uri: item.photos[0] }} style={tw`w-20 h-20 rounded-lg bg-gray-100`} />
-        <View style={tw`ml-4 flex-1`}>
-          <View style={tw`flex-row justify-between items-start mb-1`}>
-            <Text style={tw`font-bold text-base text-gray-900 flex-1`} numberOfLines={1}>
+        <Image source={{ uri: item.photos[0] }} style={tw`w-64 h-64 rounded-sm bg-neutral-200`} />
+        <View style={tw`ml-16 flex-1`}>
+          <View style={tw`flex-row justify-between items-start mb-4`}>
+            <Text style={tw`text-body-emphasis text-neutral-900 flex-1`} numberOfLines={1}>
               {item.foodType}
             </Text>
             <Badge status={item.status} />
           </View>
-          <Text style={tw`text-gray-600 text-sm mb-2`}>
+          <Text style={tw`text-body text-neutral-600 mb-8`}>
             {item.quantity} {item.unit}
           </Text>
 
           {isAvailable && !isExpiredLocally && (
-            <Text style={tw`text-xs font-medium ${isUrgent ? 'text-red-500' : 'text-gray-500'}`}>
+            <Text
+              style={tw`text-caption ${isUrgent ? 'text-danger font-semibold' : 'text-neutral-600'}`}
+            >
               {timeText}
             </Text>
           )}
           {isAvailable && isExpiredLocally && (
-            <Text style={tw`text-xs font-medium text-red-500`}>Expired</Text>
+            <Text style={tw`text-caption font-semibold text-danger`}>Expired</Text>
           )}
         </View>
       </TouchableCard>
     );
   };
 
+  const formattedTabs = TABS.map((t) => ({
+    key: t,
+    title: t === 'ALL' ? 'All' : t.charAt(0) + t.slice(1).toLowerCase(),
+  }));
+
   return (
-    <View style={tw`flex-1 bg-gray-50`}>
-      <View style={tw`bg-white pt-4 pb-2 border-b border-gray-100`}>
-        <FlatList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          data={TABS}
-          keyExtractor={(item) => item}
-          contentContainerStyle={{ paddingHorizontal: 16, gap: 8 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => setActiveTab(item)}
-              style={tw`px-4 py-2 rounded-full border ${
-                activeTab === item
-                  ? 'bg-primary-600 border-primary-600'
-                  : 'bg-white border-gray-200'
-              }`}
-            >
-              <Text
-                style={tw`text-sm font-medium ${
-                  activeTab === item ? 'text-white' : 'text-gray-600'
-                }`}
-              >
-                {item.charAt(0) + item.slice(1).toLowerCase()}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
+    <View style={tw`flex-1 bg-neutral-50`}>
+      <View style={tw`bg-surface pt-16`}>
+        <Tabs tabs={formattedTabs} activeTab={activeTab} onChange={setActiveTab} />
       </View>
 
       {isLoading ? (
-        <View style={tw`flex-1 justify-center items-center`}>
-          <ActivityIndicator size="large" color="#059669" />
+        <View style={tw`flex-1 p-16 space-y-16`}>
+          {[1, 2, 3].map((i) => (
+            <View
+              key={i}
+              style={tw`flex-row bg-surface rounded-lg p-12 border border-neutral-200 shadow-resting mb-16`}
+            >
+              <Skeleton style={tw`w-64 h-64 rounded-sm`} />
+              <View style={tw`ml-16 flex-1 justify-center space-y-8`}>
+                <View style={tw`flex-row justify-between items-center`}>
+                  <Skeleton style={tw`h-16 w-32 rounded`} />
+                  <Skeleton style={tw`h-24 w-24 rounded-pill`} />
+                </View>
+                <Skeleton style={tw`h-16 w-24 rounded`} />
+                <Skeleton style={tw`h-12 w-48 rounded`} />
+              </View>
+            </View>
+          ))}
         </View>
       ) : isError ? (
         <ErrorState
@@ -155,16 +146,16 @@ export default function MyListings() {
           initialNumToRender={10}
           windowSize={21}
           maxToRenderPerBatch={10}
-          contentContainerStyle={{ padding: 16 }}
+          contentContainerStyle={tw`p-16`}
           onEndReached={() => {
             if (hasNextPage) fetchNextPage();
           }}
           onEndReachedThreshold={0.5}
           refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={refetch} colors={['#059669']} />
+            <RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#1B7A4D" />
           }
           ListFooterComponent={
-            isFetchingNextPage ? <ActivityIndicator style={tw`my-4`} color="#059669" /> : null
+            isFetchingNextPage ? <ActivityIndicator style={tw`my-16`} color="#1B7A4D" /> : null
           }
         />
       )}
