@@ -19,8 +19,6 @@ import {
   Mail,
   Navigation,
   CheckCircle,
-  AlertTriangle,
-  XCircle,
   ShieldCheck,
   Calendar,
 } from 'lucide-react-native';
@@ -299,10 +297,10 @@ export default function ListingDetail() {
                   key={idx}
                   style={[
                     { width: SCREEN_WIDTH },
-                    tw`h-72 bg-gray-100 items-center justify-center`,
+                    tw`h-72 bg-neutral-100 items-center justify-center`,
                   ]}
                 >
-                  <Text style={tw`text-gray-400`}>Photo {idx + 1}</Text>
+                  <Text style={tw`text-neutral-400`}>Photo {idx + 1}</Text>
                 </View>
               ))}
             </ScrollView>
@@ -326,12 +324,12 @@ export default function ListingDetail() {
           </View>
         )}
 
-        <View style={tw`px-4 pt-4 pb-8`}>
+        <View style={tw`px-16 pt-16 pb-32`}>
           {/* Header */}
-          <View style={tw`flex-row items-start justify-between mb-2`}>
-            <View style={tw`flex-1 mr-3`}>
-              <Text style={tw`text-2xl font-bold text-gray-900`}>{listing.title}</Text>
-              <Text style={tw`text-base text-gray-500 mt-1`}>
+          <View style={tw`flex-row items-start justify-between mb-8`}>
+            <View style={tw`flex-1 mr-12`}>
+              <Text style={tw`text-h2 text-neutral-900`}>{listing.title}</Text>
+              <Text style={tw`text-body text-neutral-500 mt-4`}>
                 {listing.donor.orgName || listing.donor.name || 'Food Provider'}
               </Text>
             </View>
@@ -341,34 +339,35 @@ export default function ListingDetail() {
           {/* Time remaining alert */}
           {timeRemaining.urgent && listing.status === 'AVAILABLE' && (
             <View
-              style={tw`bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex-row items-center`}
+              style={tw`bg-danger/10 border border-danger/20 rounded-md px-16 py-12 mb-16 flex-row items-center`}
             >
-              <Clock size={20} color="#EF4444" />
-              <Text style={tw`text-red-700 text-sm font-medium ml-2 flex-1`}>
+              <Clock size={20} color="#D9432E" />
+              <Text style={tw`text-danger text-caption font-medium ml-8 flex-1`}>
                 Only {timeRemaining.text} left to request this food!
               </Text>
             </View>
           )}
 
           {/* Key Info Cards */}
-          <View style={tw`flex-row flex-wrap mb-4`}>
-            <View style={tw`bg-white rounded-xl p-3 mr-2 mb-2 min-w-[30%]`}>
-              <Text style={tw`text-xs text-gray-500 mb-1`}>Quantity</Text>
-              <Text style={tw`text-lg font-bold text-gray-900`}>
+          <View style={tw`flex-row flex-wrap mb-16`}>
+            <View
+              style={tw`bg-surface rounded-md p-12 mr-8 mb-8 min-w-[30%] border border-neutral-200`}
+            >
+              <Text style={tw`text-caption text-neutral-500 mb-4`}>Quantity</Text>
+              <Text style={tw`text-h3 text-neutral-900`}>
                 {listing.quantity} {listing.unit}
               </Text>
             </View>
-            <View style={tw`bg-white rounded-xl p-3 mr-2 mb-2 min-w-[30%]`}>
-              <Text style={tw`text-xs text-gray-500 mb-1`}>Food Type</Text>
-              <Text style={tw`text-lg font-bold text-gray-900 capitalize`}>{listing.foodType}</Text>
+            <View
+              style={tw`bg-surface rounded-md p-12 mr-8 mb-8 min-w-[30%] border border-neutral-200`}
+            >
+              <Text style={tw`text-caption text-neutral-500 mb-4`}>Food Type</Text>
+              <Text style={tw`text-h3 text-neutral-900 capitalize`}>{listing.foodType}</Text>
             </View>
-            <View style={tw`bg-white rounded-xl p-3 mb-2 min-w-[30%]`}>
-              <Text style={tw`text-xs text-gray-500 mb-1`}>Time Left</Text>
+            <View style={tw`bg-surface rounded-md p-12 mb-8 min-w-[30%] border border-neutral-200`}>
+              <Text style={tw`text-caption text-neutral-500 mb-4`}>Time Left</Text>
               <Text
-                style={[
-                  tw`text-lg font-bold`,
-                  timeRemaining.urgent ? tw`text-red-500` : tw`text-gray-900`,
-                ]}
+                style={[tw`text-h3`, timeRemaining.urgent ? tw`text-danger` : tw`text-neutral-900`]}
               >
                 {timeRemaining.text}
               </Text>
@@ -377,155 +376,140 @@ export default function ListingDetail() {
 
           {/* Description */}
           {listing.description && (
-            <Card style={tw`mb-4`}>
-              <Text style={tw`text-sm font-semibold text-gray-700 mb-1`}>Description</Text>
-              <Text style={tw`text-base text-gray-600 leading-5`}>{listing.description}</Text>
+            <Card style={tw`mb-16 border-neutral-200 bg-surface`}>
+              <Text style={tw`text-body-emphasis text-neutral-700 mb-4`}>Description</Text>
+              <Text style={tw`text-body text-neutral-600 leading-5`}>{listing.description}</Text>
             </Card>
           )}
 
           {/* Timing Info */}
-          <Card style={tw`mb-4`}>
-            <Text style={tw`text-sm font-semibold text-gray-700 mb-2`}>Timing</Text>
-            <View style={tw`flex-row items-center mb-1`}>
+          <Card style={tw`mb-16 border-neutral-200 bg-surface`}>
+            <Text style={tw`text-body-emphasis text-neutral-700 mb-8`}>Timing</Text>
+            <View style={tw`flex-row items-center mb-4`}>
               <Calendar size={14} color="#6B7280" />
-              <Text style={tw`text-sm text-gray-600 ml-2`}>
+              <Text style={tw`text-body text-neutral-600 ml-8`}>
                 Prepared {format(new Date(listing.preparedAt), 'MMM d, h:mm a')}
               </Text>
             </View>
             <View style={tw`flex-row items-center`}>
               <Clock size={14} color="#6B7280" />
-              <Text style={tw`text-sm text-gray-600 ml-2`}>
+              <Text style={tw`text-body text-neutral-600 ml-8`}>
                 Safe until {format(new Date(listing.safeUntil), 'MMM d, h:mm a')}
               </Text>
             </View>
           </Card>
 
-          {/* Pickup Area (address always shown, contact hidden until approved) */}
-          <Card style={tw`mb-4`}>
-            <View style={tw`flex-row items-center mb-1`}>
-              <MapPin size={16} color="#3B6D11" />
-              <Text style={tw`text-sm font-semibold text-gray-700 ml-2`}>Pickup Location</Text>
+          {/* Pickup Area */}
+          <Card style={tw`mb-16 border-neutral-200 bg-surface`}>
+            <View style={tw`flex-row items-center mb-4`}>
+              <MapPin size={16} color="#1B7A4D" />
+              <Text style={tw`text-body-emphasis text-neutral-700 ml-8`}>Pickup Location</Text>
             </View>
-            <Text style={tw`text-base text-gray-600 mt-1`}>{listing.pickupAddress}</Text>
+            <Text style={tw`text-body text-neutral-600 mt-4`}>{listing.pickupAddress}</Text>
 
             {/* Full details only if APPROVED */}
             {myRequest?.status === 'ACCEPTED' && listing.donor.email && (
               <>
-                <View style={tw`border-t border-gray-100 mt-3 pt-3`}>
-                  <Text style={tw`text-sm font-semibold text-gray-700 mb-2`}>Donor Contact</Text>
+                <View style={tw`border-t border-neutral-100 mt-12 pt-12`}>
+                  <Text style={tw`text-body-emphasis text-neutral-700 mb-8`}>Donor Contact</Text>
                   {listing.donor.name && (
-                    <View style={tw`flex-row items-center mb-2`}>
+                    <View style={tw`flex-row items-center mb-8`}>
                       <User size={14} color="#6B7280" />
-                      <Text style={tw`text-sm text-gray-600 ml-2`}>{listing.donor.name}</Text>
+                      <Text style={tw`text-body text-neutral-600 ml-8`}>{listing.donor.name}</Text>
                     </View>
                   )}
                   {listing.donor.phone && (
-                    <TouchableOpacity style={tw`flex-row items-center mb-2`} onPress={callDonor}>
-                      <Phone size={14} color="#3B6D11" />
-                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
+                    <TouchableOpacity style={tw`flex-row items-center mb-8`} onPress={callDonor}>
+                      <Phone size={14} color="#1B7A4D" />
+                      <Text style={tw`text-body text-primary ml-8 underline`}>
                         {listing.donor.phone}
                       </Text>
                     </TouchableOpacity>
                   )}
                   {listing.donor.email && (
                     <TouchableOpacity style={tw`flex-row items-center`} onPress={emailDonor}>
-                      <Mail size={14} color="#3B6D11" />
-                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
+                      <Mail size={14} color="#1B7A4D" />
+                      <Text style={tw`text-body text-primary ml-8 underline`}>
                         {listing.donor.email}
                       </Text>
                     </TouchableOpacity>
                   )}
                 </View>
 
-                <View style={tw`mt-4`}>
+                <View style={tw`mt-16`}>
                   <TouchableOpacity
-                    style={tw`flex-row items-center justify-center bg-accent-500 rounded-xl py-3 px-6`}
+                    style={tw`flex-row items-center justify-center bg-accent rounded-md py-12 px-24`}
                     onPress={openDirections}
                   >
                     <Navigation size={18} color="#ffffff" />
-                    <Text style={tw`text-white font-semibold ml-2`}>Get Directions</Text>
+                    <Text style={tw`text-white font-semibold ml-8`}>Get Directions</Text>
                   </TouchableOpacity>
                 </View>
               </>
             )}
           </Card>
 
-          {/* Request Status / Call to Action */}
-          {!requestBadge && listing.status === 'AVAILABLE' && (
-            <Button
-              variant="primary"
-              fullWidth
-              size="lg"
-              loading={requesting}
-              disabled={requesting}
-              onPress={handleRequestFood}
-            >
-              Request this Food
-            </Button>
-          )}
-
-          {requestBadge === 'PENDING' && (
-            <View style={tw`bg-yellow-50 border border-yellow-200 rounded-xl p-4 items-center`}>
-              <Clock size={28} color="#D97706" />
-              <Text style={tw`text-lg font-semibold text-yellow-800 mt-2`}>Request Pending</Text>
-              <Text style={tw`text-sm text-yellow-700 text-center mt-1`}>
-                Waiting for the donor to review your request.
-              </Text>
-            </View>
-          )}
-
-          {requestBadge === 'ACCEPTED' && (
-            <View style={tw`bg-green-50 border border-green-200 rounded-xl p-4 mb-4`}>
-              <View style={tw`items-center`}>
-                <CheckCircle size={32} color="#3B6D11" />
-                <Text style={tw`text-lg font-semibold text-primary-700 mt-2`}>
-                  Request Approved!
+          {/* Request Status / Call to Action State Machine */}
+          <View style={tw`mt-16`}>
+            {listing.status === 'AVAILABLE' && !requestBadge ? (
+              <Button
+                variant="primary"
+                fullWidth
+                size="lg"
+                loading={requesting}
+                disabled={requesting}
+                onPress={handleRequestFood}
+              >
+                Request this Food
+              </Button>
+            ) : requestBadge === 'PENDING' ? (
+              <Button
+                variant="primary"
+                fullWidth
+                size="lg"
+                disabled={true}
+                onPress={() => {}}
+                style={tw`opacity-70`}
+              >
+                Request Pending
+              </Button>
+            ) : requestBadge === 'ACCEPTED' ? (
+              <Button
+                variant="primary"
+                fullWidth
+                size="lg"
+                loading={collecting}
+                disabled={collecting}
+                onPress={handleCollect}
+              >
+                Mark as Collected
+              </Button>
+            ) : requestBadge === 'REJECTED' || requestBadge === 'CANCELLED' ? (
+              <Button
+                variant="ghost"
+                fullWidth
+                size="lg"
+                disabled={true}
+                onPress={() => {}}
+                style={tw`border-danger/20`}
+              >
+                <Text style={tw`text-danger`}>
+                  Request {requestBadge === 'REJECTED' ? 'Declined' : 'Cancelled'}
                 </Text>
-                <Text style={tw`text-sm text-primary-600 text-center mt-1`}>
-                  Pickup details are now available above. Please collect the food before it expires.
-                </Text>
-              </View>
-              <View style={tw`mt-4`}>
-                <Button
-                  variant="primary"
-                  fullWidth
-                  size="lg"
-                  loading={collecting}
-                  disabled={collecting}
-                  onPress={handleCollect}
-                >
-                  Mark as Collected
-                </Button>
-              </View>
-            </View>
-          )}
-
-          {requestBadge === 'REJECTED' && (
-            <View style={tw`bg-red-50 border border-red-200 rounded-xl p-4 items-center`}>
-              <XCircle size={28} color="#EF4444" />
-              <Text style={tw`text-lg font-semibold text-red-800 mt-2`}>Request Declined</Text>
-              <Text style={tw`text-sm text-red-700 text-center mt-1`}>
-                The donor was unable to fulfill your request.
-              </Text>
-            </View>
-          )}
-
-          {requestBadge === 'CANCELLED' && (
-            <View style={tw`bg-gray-50 border border-gray-200 rounded-xl p-4 items-center`}>
-              <XCircle size={28} color="#6B7280" />
-              <Text style={tw`text-lg font-semibold text-gray-700 mt-2`}>Request Cancelled</Text>
-            </View>
-          )}
-
-          {listing.status !== 'AVAILABLE' && !requestBadge && (
-            <View style={tw`bg-gray-50 border border-gray-200 rounded-xl p-4 items-center`}>
-              <AlertTriangle size={28} color="#6B7280" />
-              <Text style={tw`text-lg font-semibold text-gray-700 mt-2`}>No Longer Available</Text>
-              <Text style={tw`text-sm text-gray-600 text-center mt-1`}>
-                This listing has been {listing.status.toLowerCase()}.
-              </Text>
-            </View>
-          )}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                fullWidth
+                size="lg"
+                disabled={true}
+                onPress={() => {}}
+                style={tw`border-neutral-200`}
+              >
+                <Text style={tw`text-neutral-500`}>Reserved by someone else</Text>
+              </Button>
+            )}
+          </View>
 
           {/* Verification info */}
           <View style={tw`flex-row items-center justify-center mt-6`}>

@@ -16,16 +16,18 @@ import tw from '../../../src/utils/tw';
 import { Button } from '../../../src/components/ui/Button';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Skeleton, EmptyState, ErrorState } from '../../../src/components/ui/Feedback';
+import { Tabs } from '../../../src/components/ui/Tabs';
+import { TouchableCard } from '../../../src/components/ui/Card';
 import { useUI } from '../../../src/components/ui/Providers';
 import { api } from '../../../src/services/api';
 
 type Tab = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COLLECTED';
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: 'PENDING', label: 'Pending' },
-  { key: 'ACCEPTED', label: 'Approved' },
-  { key: 'REJECTED', label: 'Rejected' },
-  { key: 'COLLECTED', label: 'History' },
+const TABS: { key: Tab; title: string }[] = [
+  { key: 'PENDING', title: 'Pending' },
+  { key: 'ACCEPTED', title: 'Approved' },
+  { key: 'REJECTED', title: 'Rejected' },
+  { key: 'COLLECTED', title: 'History' },
 ];
 
 interface FoodListing {
@@ -178,68 +180,68 @@ export default function MyRequests() {
     if (!listing) return null;
 
     return (
-      <View style={tw`bg-white rounded-2xl border border-gray-100 mb-3 overflow-hidden`}>
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => (router as any).push(`/(receiver)/listing/${listing.id}`)}
-        >
-          <View style={tw`flex-row p-4`}>
-            <View style={tw`w-16 h-16 bg-primary-50 rounded-xl items-center justify-center`}>
-              <PackageOpen size={28} color="#97C459" />
-            </View>
-            <View style={tw`flex-1 ml-3 justify-center`}>
-              <View style={tw`flex-row items-center justify-between`}>
-                <Text style={tw`font-bold text-gray-900 flex-1 mr-2`} numberOfLines={1}>
-                  {listing.title}
-                </Text>
-                <Badge status={item.status} />
-              </View>
-              <Text style={tw`text-sm text-gray-500 mt-1`}>
-                {listing.quantity} {listing.unit} &middot; {listing.foodType}
-              </Text>
-              <Text style={tw`text-xs text-gray-400 mt-1`}>{getTimestamp(item)}</Text>
-            </View>
+      <TouchableCard
+        style={tw`mb-12 overflow-hidden border-neutral-200 bg-surface`}
+        onPress={() => (router as any).push(`/(receiver)/listing/${listing.id}`)}
+      >
+        <View style={tw`flex-row p-16`}>
+          <View style={tw`w-48 h-48 bg-primary-50 rounded-xl items-center justify-center`}>
+            <PackageOpen size={28} color="#1B7A4D" />
           </View>
-        </TouchableOpacity>
+          <View style={tw`flex-1 ml-3 justify-center`}>
+            <View style={tw`flex-row items-center justify-between`}>
+              <Text style={tw`text-h3 text-neutral-900 flex-1 mr-8`} numberOfLines={1}>
+                {listing.title}
+              </Text>
+              <Badge status={item.status} />
+            </View>
+            <Text style={tw`text-body text-neutral-600 mt-4`}>
+              {listing.quantity} {listing.unit} &middot; {listing.foodType}
+            </Text>
+            <Text style={tw`text-caption text-neutral-400 mt-4`}>{getTimestamp(item)}</Text>
+          </View>
+        </View>
 
         {/* Action buttons for each tab */}
         {activeTab === 'PENDING' && (
-          <View style={tw`px-4 pb-4`}>
+          <View style={tw`px-16 pb-16`}>
             <Button
               variant="ghost"
               size="sm"
               loading={cancellingId === item.id}
               disabled={cancellingId === item.id}
               onPress={() => handleCancel(item)}
-              style={tw`border-red-200`}
+              style={tw`border-danger/20`}
             >
-              Cancel Request
+              <Text style={tw`text-danger`}>Cancel Request</Text>
             </Button>
           </View>
         )}
 
         {activeTab === 'ACCEPTED' && (
-          <View style={tw`px-4 pb-4`}>
+          <View style={tw`px-16 pb-16`}>
             {/* Pickup details inline */}
             {listing.donor && (
-              <View style={tw`bg-primary-50 rounded-xl p-3 mb-3`}>
-                <Text style={tw`text-xs font-semibold text-primary-700 mb-2`}>Pickup Details</Text>
-                <View style={tw`flex-row items-center mb-1`}>
-                  <MapPin size={12} color="#3B6D11" />
-                  <Text style={tw`text-sm text-gray-700 ml-2 flex-1`} numberOfLines={2}>
+              <View style={tw`bg-primary-50 rounded-xl p-12 mb-12`}>
+                <Text style={tw`text-caption font-semibold text-primary-800 mb-8`}>
+                  Pickup Details
+                </Text>
+                <View style={tw`flex-row items-center mb-4`}>
+                  <MapPin size={12} color="#1B7A4D" />
+                  <Text style={tw`text-body text-primary-900 ml-8 flex-1`} numberOfLines={2}>
                     {listing.pickupAddress}
                   </Text>
                 </View>
                 {listing.donor.name && (
-                  <View style={tw`flex-row items-center mb-1`}>
-                    <User size={12} color="#3B6D11" />
-                    <Text style={tw`text-sm text-gray-700 ml-2`}>{listing.donor.name}</Text>
+                  <View style={tw`flex-row items-center mb-4`}>
+                    <User size={12} color="#1B7A4D" />
+                    <Text style={tw`text-body text-primary-900 ml-8`}>{listing.donor.name}</Text>
                   </View>
                 )}
                 {listing.donor.phone && (
-                  <TouchableOpacity style={tw`flex-row items-center mb-1`} onPress={() => {}}>
-                    <Phone size={12} color="#3B6D11" />
-                    <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
+                  <TouchableOpacity style={tw`flex-row items-center mb-4`} onPress={() => {}}>
+                    <Phone size={12} color="#1B7A4D" />
+                    <Text style={tw`text-body text-primary ml-8 underline`}>
                       {listing.donor.phone}
                     </Text>
                   </TouchableOpacity>
@@ -251,19 +253,19 @@ export default function MyRequests() {
               <Button
                 variant="ghost"
                 size="sm"
-                style={tw`flex-1 mr-2 border-primary-200`}
+                style={tw`flex-1 mr-8 border-primary/20`}
                 onPress={() =>
                   router.push(
-                    `https://www.google.com/maps/dir/?api=1&destination=${listing.pickupLat},${listing.pickupLng}`,
+                    `https://www.google.com/maps/dir/?api=1&destination=${listing.pickupLat},${listing.pickupLng}` as any,
                   )
                 }
               >
-                <Navigation size={14} color="#3B6D11" />
+                <Navigation size={14} color="#1B7A4D" />
               </Button>
               <Button
                 variant="primary"
                 size="sm"
-                style={tw`flex-1 ml-2`}
+                style={tw`flex-1 ml-8`}
                 loading={collectingId === item.id}
                 disabled={collectingId === item.id}
                 onPress={() => handleCollect(item)}
@@ -273,7 +275,7 @@ export default function MyRequests() {
             </View>
           </View>
         )}
-      </View>
+      </TouchableCard>
     );
   };
 
@@ -316,29 +318,12 @@ export default function MyRequests() {
   }
 
   return (
-    <View style={tw`flex-1 bg-gray-50`}>
-      <View style={tw`bg-white pt-12 pb-2 px-4 border-b border-gray-100`}>
-        <Text style={tw`text-2xl font-bold text-primary-600 mb-3`}>My Requests</Text>
+    <View style={tw`flex-1 bg-neutral-50`}>
+      <View style={tw`bg-surface pt-48 pb-0 px-16 border-b border-neutral-100`}>
+        <Text style={tw`text-display font-bold text-primary mb-12`}>My Requests</Text>
 
         {/* Tab bar */}
-        <View style={tw`flex-row`}>
-          {TABS.map((tab) => (
-            <TouchableOpacity
-              key={tab.key}
-              style={tw`mr-6 pb-3 ${activeTab === tab.key ? 'border-b-2 border-primary-600' : ''}`}
-              onPress={() => setActiveTab(tab.key)}
-            >
-              <Text
-                style={[
-                  tw`text-base font-medium`,
-                  activeTab === tab.key ? tw`text-primary-600` : tw`text-gray-500`,
-                ]}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <Tabs tabs={TABS} activeTab={activeTab} onChange={(k) => setActiveTab(k as Tab)} />
       </View>
 
       {filteredRequests.length === 0 ? (

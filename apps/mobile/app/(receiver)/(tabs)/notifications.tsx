@@ -24,26 +24,25 @@ function NotificationItem({ item, onPress }: { item: AppNotification; onPress: (
 
   return (
     <TouchableOpacity
-      style={tw`flex-row items-center px-6 py-4 border-b border-gray-100 ${!item.read ? 'bg-primary-50/30' : ''}`}
+      style={tw`flex-row items-center p-16 border-b border-neutral-100 ${!item.read ? 'bg-primary-50/30' : 'bg-surface'}`}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <View
-        style={tw`h-10 w-10 rounded-full ${item.read ? 'bg-gray-100' : 'bg-primary-100'} items-center justify-center mr-3`}
+        style={tw`h-48 w-48 rounded-full ${item.read ? 'bg-neutral-100' : 'bg-primary-100'} items-center justify-center mr-12`}
       >
-        {item.read ? <Bell size={18} color="#9CA3AF" /> : <BellRing size={18} color="#3B6D11" />}
+        {item.read ? <Bell size={24} color="#9CA3AF" /> : <BellRing size={24} color="#1B7A4D" />}
       </View>
       <View style={tw`flex-1`}>
-        <Text
-          style={tw`text-sm font-semibold text-gray-900 ${item.read ? '' : ''}`}
-          numberOfLines={1}
-        >
+        <Text style={tw`text-body-emphasis text-neutral-900`} numberOfLines={1}>
           {item.title}
         </Text>
-        <Text style={tw`text-xs text-gray-500 mt-0.5`} numberOfLines={2}>
+        <Text style={tw`text-caption text-neutral-500 mt-4`} numberOfLines={2}>
           {item.message}
         </Text>
-        {relativeTime ? <Text style={tw`text-xs text-gray-400 mt-0.5`}>{relativeTime}</Text> : null}
+        {relativeTime ? (
+          <Text style={tw`text-caption text-neutral-400 mt-4`}>{relativeTime}</Text>
+        ) : null}
       </View>
       <ChevronRight size={16} color="#D1D5DB" />
     </TouchableOpacity>
@@ -52,13 +51,13 @@ function NotificationItem({ item, onPress }: { item: AppNotification; onPress: (
 
 function NotificationsSkeleton() {
   return (
-    <View style={tw`px-6 pt-4`}>
+    <View style={tw`px-16 pt-16`}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <View key={i} style={tw`flex-row items-center mb-4`}>
-          <Skeleton style={tw`h-10 w-10 rounded-full mr-3`} />
+        <View key={i} style={tw`flex-row items-center mb-16`}>
+          <Skeleton style={tw`h-48 w-48 rounded-full mr-12`} />
           <View style={tw`flex-1`}>
-            <Skeleton style={tw`h-4 w-3/4 mb-1`} />
-            <Skeleton style={tw`h-3 w-1/2`} />
+            <Skeleton style={tw`h-16 w-3/4 mb-4`} />
+            <Skeleton style={tw`h-12 w-1/2`} />
           </View>
         </View>
       ))}
@@ -121,9 +120,9 @@ export default function ReceiverNotifications() {
   }
 
   return (
-    <View style={tw`flex-1 bg-white`}>
+    <View style={tw`flex-1 bg-surface`}>
       {notifications.length > 0 && (
-        <View style={tw`px-6 py-3 border-b border-gray-100`}>
+        <View style={tw`px-16 py-12 border-b border-neutral-100`}>
           <Button variant="ghost" size="sm" loading={markingAll} onPress={() => markAllRead()}>
             Mark All as Read
           </Button>
@@ -135,12 +134,12 @@ export default function ReceiverNotifications() {
           <NotificationItem item={item} onPress={() => handleNotificationPress(item)} />
         )}
         keyExtractor={(item) => item.id}
-        contentContainerStyle={notifications.length === 0 ? tw`flex-1` : tw`pb-8`}
+        contentContainerStyle={notifications.length === 0 ? tw`flex-1` : tw`pb-32`}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.3}
         ListEmptyComponent={renderEmpty}
         refreshControl={
-          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor="#3B6D11" />
+          <RefreshControl refreshing={isRefetching} onRefresh={handleRefresh} tintColor="#1B7A4D" />
         }
       />
     </View>

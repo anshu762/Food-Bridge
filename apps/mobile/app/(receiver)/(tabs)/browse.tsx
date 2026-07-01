@@ -25,7 +25,8 @@ import { differenceInMilliseconds, formatDistanceToNow } from 'date-fns';
 import tw from '../../../src/utils/tw';
 import { Button } from '../../../src/components/ui/Button';
 import { Skeleton, EmptyState, ErrorState } from '../../../src/components/ui/Feedback';
-import { useToast } from '../../../src/components/ui/Toast';
+import { TouchableCard } from '../../../src/components/ui/Card';
+import { useUI } from '../../../src/components/ui/Providers';
 import { api } from '../../../src/services/api';
 
 interface Listing {
@@ -49,8 +50,15 @@ interface Listing {
 type ViewMode = 'list' | 'grid';
 
 const FOOD_TYPES = [
-  'Vegetables', 'Fruits', 'Dairy', 'Bakery', 'Grains',
-  'Proteins', 'Prepared Meals', 'Non-perishable', 'Other',
+  'Vegetables',
+  'Fruits',
+  'Dairy',
+  'Bakery',
+  'Grains',
+  'Proteins',
+  'Prepared Meals',
+  'Non-perishable',
+  'Other',
 ];
 
 const RADIUS_OPTIONS = [1, 5, 10, 25, 50];
@@ -74,7 +82,7 @@ function getDistanceText(distance?: number): string | null {
 }
 
 export default function ReceiverBrowse() {
-  const { showToast } = useToast();
+  const { showToast } = useUI();
 
   const [listings, setListings] = useState<Listing[]>([]);
   const [page, setPage] = useState(1);
@@ -195,8 +203,7 @@ export default function ReceiverBrowse() {
         l.foodType.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         l.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         (l.description && l.description.toLowerCase().includes(debouncedSearch.toLowerCase()));
-      const matchesType =
-        selectedFoodTypes.length === 0 || selectedFoodTypes.includes(l.foodType);
+      const matchesType = selectedFoodTypes.length === 0 || selectedFoodTypes.includes(l.foodType);
       return matchesSearch && matchesType;
     });
   }, [listings, debouncedSearch, selectedFoodTypes]);
@@ -219,41 +226,40 @@ export default function ReceiverBrowse() {
     const distanceText = userLocation ? getDistanceText(item.distance) : null;
 
     return (
-      <TouchableOpacity
-        style={tw`bg-white rounded-2xl border border-gray-100 mb-3 overflow-hidden`}
-        activeOpacity={0.7}
+      <TouchableCard
+        style={tw`mb-12 overflow-hidden border-neutral-200 bg-surface`}
         onPress={() => (router as any).push(`/(receiver)/listing/${item.id}`)}
       >
         <View style={tw`flex-row`}>
           <View style={tw`w-24 h-24 bg-primary-50 items-center justify-center`}>
-            <PackageOpen size={32} color="#97C459" />
+            <PackageOpen size={32} color="#1B7A4D" />
           </View>
-          <View style={tw`flex-1 p-3 justify-center`}>
-            <Text style={tw`font-bold text-gray-900`} numberOfLines={1}>
+          <View style={tw`flex-1 p-12 justify-center`}>
+            <Text style={tw`text-body-emphasis text-neutral-900`} numberOfLines={1}>
               {item.title}
             </Text>
-            <Text style={tw`text-sm text-gray-500 mt-1`}>
+            <Text style={tw`text-caption text-neutral-500 mt-4`}>
               {item.donor.orgName || item.donor.name || 'Organization'}
             </Text>
-            <View style={tw`flex-row items-center mt-2`}>
-              <View style={tw`bg-primary-50 rounded-lg px-2 py-0.5 mr-2`}>
-                <Text style={tw`text-primary-600 text-xs font-medium`}>
+            <View style={tw`flex-row items-center mt-8`}>
+              <View style={tw`bg-primary-50 rounded-pill px-8 py-4 mr-8`}>
+                <Text style={tw`text-primary-800 text-caption font-semibold`}>
                   {item.quantity} {item.unit}
                 </Text>
               </View>
               {distanceText && (
                 <View style={tw`flex-row items-center`}>
                   <MapPin size={12} color="#6B7280" />
-                  <Text style={tw`text-xs text-gray-500 ml-1`}>{distanceText}</Text>
+                  <Text style={tw`text-caption text-neutral-500 ml-4`}>{distanceText}</Text>
                 </View>
               )}
             </View>
-            <View style={tw`flex-row items-center mt-1`}>
-              <Clock size={12} color={timeRemaining.urgent ? '#EF4444' : '#6B7280'} />
+            <View style={tw`flex-row items-center mt-4`}>
+              <Clock size={12} color={timeRemaining.urgent ? '#D9432E' : '#6B7280'} />
               <Text
                 style={[
-                  tw`text-xs ml-1`,
-                  timeRemaining.urgent ? tw`text-red-500 font-semibold` : tw`text-gray-500`,
+                  tw`text-caption ml-4`,
+                  timeRemaining.urgent ? tw`text-danger font-semibold` : tw`text-neutral-500`,
                 ]}
               >
                 {timeRemaining.text}
@@ -261,7 +267,7 @@ export default function ReceiverBrowse() {
             </View>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableCard>
     );
   };
 
@@ -270,70 +276,69 @@ export default function ReceiverBrowse() {
     const distanceText = userLocation ? getDistanceText(item.distance) : null;
 
     return (
-      <TouchableOpacity
-        style={tw`bg-white rounded-2xl border border-gray-100 mb-3 overflow-hidden w-[48%]`}
-        activeOpacity={0.7}
+      <TouchableCard
+        style={tw`mb-12 overflow-hidden border-neutral-200 bg-surface w-[48%]`}
         onPress={() => (router as any).push(`/(receiver)/listing/${item.id}`)}
       >
-        <View style={tw`h-28 bg-primary-50 items-center justify-center`}>
-          <PackageOpen size={36} color="#97C459" />
+        <View style={tw`h-24 bg-primary-50 items-center justify-center`}>
+          <PackageOpen size={36} color="#1B7A4D" />
         </View>
-        <View style={tw`p-3`}>
-          <Text style={tw`font-bold text-gray-900 text-sm`} numberOfLines={1}>
+        <View style={tw`p-12`}>
+          <Text style={tw`text-body-emphasis text-neutral-900`} numberOfLines={1}>
             {item.title}
           </Text>
-          <Text style={tw`text-xs text-gray-500 mt-0.5`}>
+          <Text style={tw`text-caption text-neutral-500 mt-4`}>
             {item.quantity} {item.unit}
           </Text>
-          <View style={tw`flex-row items-center justify-between mt-2`}>
+          <View style={tw`flex-row items-center justify-between mt-8`}>
             {distanceText ? (
-              <Text style={tw`text-xs text-gray-500`}>{distanceText}</Text>
+              <Text style={tw`text-caption text-neutral-500`}>{distanceText}</Text>
             ) : (
               <View />
             )}
             <Text
               style={[
-                tw`text-xs`,
-                timeRemaining.urgent ? tw`text-red-500 font-semibold` : tw`text-gray-500`,
+                tw`text-caption`,
+                timeRemaining.urgent ? tw`text-danger font-semibold` : tw`text-neutral-500`,
               ]}
             >
               {timeRemaining.text}
             </Text>
           </View>
         </View>
-      </TouchableOpacity>
+      </TouchableCard>
     );
   };
 
   const renderFilterModal = () => (
     <Modal visible={showFilters} animationType="slide" transparent>
-      <View style={tw`flex-1 bg-black/50`}>
-        <View style={tw`mt-auto bg-white rounded-t-3xl p-6 max-h-[70%]`}>
-          <View style={tw`flex-row items-center justify-between mb-6`}>
-            <Text style={tw`text-xl font-bold text-gray-900`}>Filters</Text>
+      <View style={tw`flex-1 bg-neutral-900/50`}>
+        <View style={tw`mt-auto bg-surface rounded-t-3xl p-24 max-h-[80%]`}>
+          <View style={tw`flex-row items-center justify-between mb-24`}>
+            <Text style={tw`text-h2 font-bold text-neutral-900`}>Filters</Text>
             <TouchableOpacity onPress={() => setShowFilters(false)}>
               <X size={24} color="#6B7280" />
             </TouchableOpacity>
           </View>
 
           <ScrollView>
-            <Text style={tw`text-base font-semibold text-gray-800 mb-3`}>Food Type</Text>
+            <Text style={tw`text-body-emphasis text-neutral-800 mb-12`}>Food Type</Text>
             <View style={tw`flex-row flex-wrap`}>
               {FOOD_TYPES.map((type) => (
                 <TouchableOpacity
                   key={type}
                   style={[
-                    tw`rounded-full px-4 py-2 mr-2 mb-2 border`,
+                    tw`rounded-pill px-16 py-8 mr-8 mb-8 border`,
                     selectedFoodTypes.includes(type)
-                      ? tw`bg-primary-600 border-primary-600`
-                      : tw`bg-white border-gray-200`,
+                      ? tw`bg-primary border-primary`
+                      : tw`bg-surface border-neutral-200`,
                   ]}
                   onPress={() => toggleFoodType(type)}
                 >
                   <Text
                     style={[
-                      tw`text-sm font-medium`,
-                      selectedFoodTypes.includes(type) ? tw`text-white` : tw`text-gray-700`,
+                      tw`text-body-emphasis`,
+                      selectedFoodTypes.includes(type) ? tw`text-surface` : tw`text-neutral-700`,
                     ]}
                   >
                     {type}
@@ -342,7 +347,7 @@ export default function ReceiverBrowse() {
               ))}
             </View>
 
-            <Text style={tw`text-base font-semibold text-gray-800 mb-3 mt-6`}>
+            <Text style={tw`text-body-emphasis text-neutral-800 mb-12 mt-24`}>
               Radius{radiusKm ? ` (${radiusKm} km)` : ''}
             </Text>
             <View style={tw`flex-row flex-wrap`}>
@@ -350,17 +355,17 @@ export default function ReceiverBrowse() {
                 <TouchableOpacity
                   key={r}
                   style={[
-                    tw`rounded-full px-5 py-2 mr-2 mb-2 border`,
+                    tw`rounded-pill px-16 py-8 mr-8 mb-8 border`,
                     radiusKm === r
-                      ? tw`bg-primary-600 border-primary-600`
-                      : tw`bg-white border-gray-200`,
+                      ? tw`bg-primary border-primary`
+                      : tw`bg-surface border-neutral-200`,
                   ]}
                   onPress={() => setRadiusKm(radiusKm === r ? null : r)}
                 >
                   <Text
                     style={[
-                      tw`text-sm font-medium`,
-                      radiusKm === r ? tw`text-white` : tw`text-gray-700`,
+                      tw`text-body-emphasis`,
+                      radiusKm === r ? tw`text-surface` : tw`text-neutral-700`,
                     ]}
                   >
                     {r} km
@@ -370,11 +375,11 @@ export default function ReceiverBrowse() {
             </View>
           </ScrollView>
 
-          <View style={tw`flex-row pt-4 border-t border-gray-100 mt-4`}>
-            <Button variant="ghost" style={tw`flex-1 mr-2`} onPress={clearFilters}>
+          <View style={tw`flex-row pt-16 border-t border-neutral-100 mt-16`}>
+            <Button variant="ghost" style={tw`flex-1 mr-8`} onPress={clearFilters}>
               Clear All
             </Button>
-            <Button variant="primary" style={tw`flex-1 ml-2`} onPress={() => setShowFilters(false)}>
+            <Button variant="primary" style={tw`flex-1 ml-8`} onPress={() => setShowFilters(false)}>
               Apply Filters
             </Button>
           </View>
@@ -404,14 +409,14 @@ export default function ReceiverBrowse() {
   }
 
   return (
-    <View style={tw`flex-1 bg-gray-50`}>
-      <View style={tw`bg-white pt-12 pb-3 px-4 border-b border-gray-100`}>
-        <Text style={tw`text-2xl font-bold text-primary-600 mb-2`}>Browse</Text>
+    <View style={tw`flex-1 bg-neutral-50`}>
+      <View style={tw`bg-surface pt-48 pb-12 px-16 border-b border-neutral-100`}>
+        <Text style={tw`text-display font-bold text-primary mb-12`}>Browse</Text>
         <View style={tw`flex-row items-center`}>
-          <View style={tw`flex-1 flex-row items-center bg-gray-50 rounded-xl px-3 h-10`}>
+          <View style={tw`flex-1 flex-row items-center bg-neutral-50 rounded-xl px-12 h-12`}>
             <Search size={18} color="#9CA3AF" />
             <TextInput
-              style={tw`flex-1 ml-2 text-base text-gray-900`}
+              style={tw`flex-1 ml-8 text-body text-neutral-900`}
               placeholder="Search listings..."
               placeholderTextColor="#9CA3AF"
               value={searchQuery}
@@ -424,14 +429,14 @@ export default function ReceiverBrowse() {
             )}
           </View>
           <TouchableOpacity
-            style={tw`ml-2 h-10 w-10 items-center justify-center rounded-xl bg-gray-50`}
+            style={tw`ml-8 h-12 w-12 items-center justify-center rounded-xl bg-neutral-50`}
             onPress={() => setShowFilters(true)}
           >
             <SlidersHorizontal size={18} color="#374151" />
           </TouchableOpacity>
           <TouchableOpacity
-            style={tw`ml-2 h-10 w-10 items-center justify-center rounded-xl ${
-              viewMode === 'grid' ? 'bg-primary-100' : 'bg-gray-50'
+            style={tw`ml-8 h-12 w-12 items-center justify-center rounded-xl ${
+              viewMode === 'grid' ? 'bg-primary-100' : 'bg-neutral-50'
             }`}
             onPress={() => setViewMode(viewMode === 'list' ? 'grid' : 'list')}
           >
@@ -444,11 +449,11 @@ export default function ReceiverBrowse() {
         </View>
         {locationDenied && !userLocation && (
           <TouchableOpacity
-            style={tw`flex-row items-center mt-2 bg-amber-50 rounded-lg px-3 py-2`}
+            style={tw`flex-row items-center mt-8 bg-warning/10 rounded-lg px-12 py-8`}
             onPress={requestLocation}
           >
             <MapPin size={14} color="#D97706" />
-            <Text style={tw`text-amber-700 text-xs ml-2 flex-1`}>
+            <Text style={tw`text-warning text-caption ml-8 flex-1`}>
               Enable location for distance sorting
             </Text>
           </TouchableOpacity>
@@ -477,12 +482,12 @@ export default function ReceiverBrowse() {
           renderItem={renderGridCard}
           keyExtractor={(item) => item.id}
           numColumns={2}
-          columnWrapperStyle={tw`justify-between px-4`}
-          contentContainerStyle={tw`pt-3 pb-8`}
+          columnWrapperStyle={tw`justify-between px-16`}
+          contentContainerStyle={tw`pt-12 pb-32`}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#3B6D11" />
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#1B7A4D" />
           }
         />
       ) : (
@@ -490,11 +495,11 @@ export default function ReceiverBrowse() {
           data={filteredListings}
           renderItem={renderListingCard}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={tw`px-4 pt-3 pb-8`}
+          contentContainerStyle={tw`px-16 pt-12 pb-32`}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#3B6D11" />
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor="#1B7A4D" />
           }
         />
       )}
