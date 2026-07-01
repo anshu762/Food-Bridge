@@ -1,6 +1,13 @@
-import React from 'react';
-import { TouchableOpacity, Text, ActivityIndicator, TouchableOpacityProps } from 'react-native';
+import React, { useRef } from 'react';
+import {
+  TouchableOpacity,
+  Text,
+  ActivityIndicator,
+  TouchableOpacityProps,
+  Animated,
+} from 'react-native';
 import tw from '../../utils/tw';
+import { motionPresets } from '../../lib/motion';
 
 interface ButtonProps extends TouchableOpacityProps {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -20,54 +27,78 @@ export const Button = ({
   children,
   ...props
 }: ButtonProps) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: motionPresets.tap.scale,
+      useNativeDriver: true,
+      damping: motionPresets.spring.damping,
+      stiffness: motionPresets.spring.stiffness,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      damping: motionPresets.spring.damping,
+      stiffness: motionPresets.spring.stiffness,
+    }).start();
+  };
+
   const variants = {
-    primary: tw`bg-primary-600`,
-    secondary: tw`bg-accent-500`,
-    danger: tw`bg-red-500`,
-    ghost: tw`bg-transparent border border-gray-200`,
+    primary: tw`bg-primary shadow-resting`,
+    secondary: tw`bg-accent shadow-resting`,
+    danger: tw`bg-danger shadow-resting`,
+    ghost: tw`bg-transparent border border-neutral-200`,
   };
 
   const sizes = {
-    sm: tw`py-2 px-4`,
-    md: tw`py-3 px-6`,
-    lg: tw`py-4 px-8`,
+    sm: tw`py-8 px-12 rounded-sm`,
+    md: tw`py-12 px-16 rounded-md`,
+    lg: tw`py-16 px-24 rounded-lg`,
   };
 
   const textColors = {
-    primary: tw`text-white`,
-    secondary: tw`text-white`,
-    danger: tw`text-white`,
-    ghost: tw`text-gray-700`,
+    primary: tw`text-surface`,
+    secondary: tw`text-surface`,
+    danger: tw`text-surface`,
+    ghost: tw`text-neutral-900`,
   };
 
   const isDisabled = disabled || loading;
 
   return (
-    <TouchableOpacity
-      disabled={isDisabled}
-      style={[
-        tw`flex-row items-center justify-center rounded-xl`,
-        variants[variant],
-        sizes[size],
-        fullWidth && tw`w-full`,
-        isDisabled && tw`opacity-60`,
-        style,
-      ]}
-      {...props}
-    >
-      {loading ? (
-        <ActivityIndicator size="small" color={variant === 'ghost' ? '#374151' : '#ffffff'} />
-      ) : (
-        <Text
-          style={[
-            tw`font-semibold text-center`,
-            textColors[variant],
-            size === 'lg' ? tw`text-lg` : tw`text-base`,
-          ]}
-        >
-          {children}
-        </Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, fullWidth && tw`w-full`]}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        disabled={isDisabled}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={[
+          tw`flex-row items-center justify-center`,
+          variants[variant],
+          sizes[size],
+          isDisabled && tw`opacity-50`,
+          style,
+        ]}
+        {...props}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={variant === 'ghost' ? '#111827' : '#FFFFFF'} />
+        ) : (
+          <Text
+            style={[
+              tw`text-center text-body-emphasis`,
+              textColors[variant],
+              size === 'lg' ? tw`text-h3` : tw`text-body-emphasis`,
+            ]}
+          >
+            {children}
+          </Text>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };

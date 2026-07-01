@@ -12,45 +12,52 @@ interface InputProps extends TextInputProps {
 }
 
 export const Input = React.forwardRef<TextInput, InputProps>(
-  (
-    { label, helperText, error, secureTextEntryToggle, secureTextEntry, style, ...props },
-    ref,
-  ) => {
+  ({ label, helperText, error, secureTextEntryToggle, secureTextEntry, style, ...props }, ref) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
     const isSecure = secureTextEntry && !isPasswordVisible;
 
     return (
-      <View style={tw`mb-4 w-full`}>
-        {label && <Text style={tw`mb-1 text-sm font-medium text-gray-700`}>{label}</Text>}
+      <View style={tw`mb-16 w-full`}>
+        {label && <Text style={tw`mb-8 text-body-emphasis text-neutral-900`}>{label}</Text>}
         <View style={tw`relative justify-center`}>
           <TextInput
             ref={ref}
+            onFocus={(e) => {
+              setIsFocused(true);
+              props.onFocus?.(e);
+            }}
+            onBlur={(e) => {
+              setIsFocused(false);
+              props.onBlur?.(e);
+            }}
             style={[
-              tw`w-full rounded-xl border bg-gray-50 px-4 py-3 text-base text-gray-900`,
-              error ? tw`border-red-500` : tw`border-gray-200`,
+              tw`w-full rounded-md border bg-neutral-50 px-16 py-12 text-body text-neutral-900`,
+              isFocused ? tw`border-primary` : tw`border-neutral-200`,
+              error && tw`border-danger`,
               style,
             ]}
             secureTextEntry={isSecure}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#4B5563"
             {...props}
           />
           {secureTextEntryToggle && (
             <TouchableOpacity
-              style={tw`absolute right-4`}
+              style={tw`absolute right-16`}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
               {isPasswordVisible ? (
-                <EyeOff color="#6B7280" size={20} />
+                <EyeOff color="#4B5563" size={20} />
               ) : (
-                <Eye color="#6B7280" size={20} />
+                <Eye color="#4B5563" size={20} />
               )}
             </TouchableOpacity>
           )}
         </View>
         {error ? (
-          <Text style={tw`mt-1 text-sm text-red-500`}>{error}</Text>
+          <Text style={tw`mt-4 text-caption text-danger`}>{error}</Text>
         ) : helperText ? (
-          <Text style={tw`mt-1 text-sm text-gray-500`}>{helperText}</Text>
+          <Text style={tw`mt-4 text-caption text-neutral-600`}>{helperText}</Text>
         ) : null}
       </View>
     );
