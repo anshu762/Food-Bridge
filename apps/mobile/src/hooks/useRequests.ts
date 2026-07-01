@@ -1,16 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { requestsService } from '../services/requests';
+import * as Sentry from '@sentry/react-native';
 
 export const useApproveRequest = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (requestId: string) => requestsService.approveRequest(requestId),
-    onSuccess: (_, requestId) => {
-      // Invalidate the listing this request belongs to
-      // Since we don't know the listingId here directly, we'll invalidate all listings
-      // which is fine for now. But better to invalidate specifically if possible.
+    onSuccess: (_, _requestId) => {
       queryClient.invalidateQueries({ queryKey: ['my-listings'] });
-      queryClient.invalidateQueries({ queryKey: ['listing'] }); 
+      queryClient.invalidateQueries({ queryKey: ['listing'] });
+    },
+    onError: (error, requestId) => {
+      Sentry.captureException(error, { extra: { action: 'approveRequest', requestId } });
     },
   });
 };
@@ -22,6 +23,9 @@ export const useRejectRequest = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-listings'] });
       queryClient.invalidateQueries({ queryKey: ['listing'] });
+    },
+    onError: (error, requestId) => {
+      Sentry.captureException(error, { extra: { action: 'rejectRequest', requestId } });
     },
   });
 };

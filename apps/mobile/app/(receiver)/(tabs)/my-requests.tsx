@@ -1,12 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Alert,
-  RefreshControl,
-} from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import {
   Clock,
@@ -75,22 +68,25 @@ export default function MyRequests() {
   const [cancellingId, setCancellingId] = useState<string | null>(null);
   const [collectingId, setCollectingId] = useState<string | null>(null);
 
-  const fetchRequests = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    setError(null);
+  const fetchRequests = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      setError(null);
 
-    try {
-      const res = await api.get('/requests/mine');
-      setAllRequests(res.data.data || []);
-    } catch {
-      setError('Failed to load your requests.');
-      showToast({ message: 'Failed to load requests', type: 'error' });
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [showToast]);
+      try {
+        const res = await api.get('/requests/mine');
+        setAllRequests(res.data.data || []);
+      } catch {
+        setError('Failed to load your requests.');
+        showToast({ message: 'Failed to load requests', type: 'error' });
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
+      }
+    },
+    [showToast],
+  );
 
   useEffect(() => {
     fetchRequests();
@@ -250,10 +246,7 @@ export default function MyRequests() {
                   </View>
                 )}
                 {listing.donor.phone && (
-                  <TouchableOpacity
-                    style={tw`flex-row items-center mb-1`}
-                    onPress={() => {}}
-                  >
+                  <TouchableOpacity style={tw`flex-row items-center mb-1`} onPress={() => {}}>
                     <Phone size={12} color="#3B6D11" />
                     <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
                       {listing.donor.phone}
@@ -364,9 +357,7 @@ export default function MyRequests() {
           icon={activeTab === 'ACCEPTED' ? CheckCircle : Clock}
           actionLabel={activeTab === 'PENDING' ? 'Browse Listings' : undefined}
           onAction={
-            activeTab === 'PENDING'
-              ? () => (router as any).push('/(receiver)/(tabs)')
-              : undefined
+            activeTab === 'PENDING' ? () => (router as any).push('/(receiver)/(tabs)') : undefined
           }
         />
       ) : (
@@ -374,6 +365,9 @@ export default function MyRequests() {
           data={filteredRequests}
           renderItem={renderRequestItem}
           keyExtractor={(item) => item.id}
+          initialNumToRender={10}
+          windowSize={21}
+          maxToRenderPerBatch={10}
           contentContainerStyle={tw`px-4 pt-4 pb-8`}
           refreshControl={
             <RefreshControl

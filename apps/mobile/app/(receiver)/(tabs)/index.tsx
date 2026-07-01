@@ -51,8 +51,15 @@ interface Listing {
 type ViewMode = 'list' | 'map';
 
 const FOOD_TYPES = [
-  'Vegetables', 'Fruits', 'Dairy', 'Bakery', 'Grains',
-  'Proteins', 'Prepared Meals', 'Non-perishable', 'Other',
+  'Vegetables',
+  'Fruits',
+  'Dairy',
+  'Bakery',
+  'Grains',
+  'Proteins',
+  'Prepared Meals',
+  'Non-perishable',
+  'Other',
 ];
 
 const RADIUS_OPTIONS = [1, 5, 10, 25, 50];
@@ -229,8 +236,7 @@ export default function ReceiverDiscover() {
         l.foodType.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         l.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         (l.description && l.description.toLowerCase().includes(debouncedSearch.toLowerCase()));
-      const matchesType =
-        selectedFoodTypes.length === 0 || selectedFoodTypes.includes(l.foodType);
+      const matchesType = selectedFoodTypes.length === 0 || selectedFoodTypes.includes(l.foodType);
       return matchesSearch && matchesType;
     });
   }, [listings, debouncedSearch, selectedFoodTypes]);
@@ -265,9 +271,7 @@ export default function ReceiverDiscover() {
       >
         {item.photos && item.photos.length > 0 ? (
           <View style={tw`h-44 bg-gray-100`}>
-            <View
-              style={tw`flex-1 items-center justify-center bg-gray-100`}
-            >
+            <View style={tw`flex-1 items-center justify-center bg-gray-100`}>
               <Text style={tw`text-gray-400 text-base`}>{item.foodType}</Text>
             </View>
           </View>
@@ -433,10 +437,7 @@ export default function ReceiverDiscover() {
                         <Text style={tw`text-xs text-gray-500 ml-1`}>{distanceText}</Text>
                       </View>
                     )}
-                    <Clock
-                      size={12}
-                      color={timeRemaining.urgent ? '#EF4444' : '#6B7280'}
-                    />
+                    <Clock size={12} color={timeRemaining.urgent ? '#EF4444' : '#6B7280'} />
                     <Text
                       style={[
                         tw`text-xs ml-1`,
@@ -547,9 +548,7 @@ export default function ReceiverDiscover() {
       {/* Header */}
       <View style={tw`bg-white pt-12 pb-4 px-4 border-b border-gray-100`}>
         <Text style={tw`text-2xl font-bold text-primary-600 mb-1`}>Discover</Text>
-        <Text style={tw`text-gray-500 text-sm`}>
-          Find surplus food near you
-        </Text>
+        <Text style={tw`text-gray-500 text-sm`}>Find surplus food near you</Text>
       </View>
 
       {/* Search + Filter bar */}
@@ -606,7 +605,11 @@ export default function ReceiverDiscover() {
           <View style={tw`flex-row items-center mt-2`}>
             <MapPin size={14} color="#3B6D11" />
             <Text style={tw`text-gray-500 text-xs ml-1`}>
-              {locationDenied ? 'Location off' : locationName ? `Near ${locationName}` : 'Fetching location...'}
+              {locationDenied
+                ? 'Location off'
+                : locationName
+                  ? `Near ${locationName}`
+                  : 'Fetching location...'}
               {radiusKm && !locationDenied ? ` · ${radiusKm} km radius` : ''}
             </Text>
           </View>
@@ -627,6 +630,9 @@ export default function ReceiverDiscover() {
           data={filteredListings}
           renderItem={renderListingCard}
           keyExtractor={(item) => item.id}
+          initialNumToRender={10}
+          windowSize={21}
+          maxToRenderPerBatch={10}
           contentContainerStyle={tw`px-6 pt-4 pb-8`}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.3}

@@ -1,5 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { useInfiniteMyListings } from '../../src/hooks/useListings';
 import { TouchableCard } from '../../src/components/ui/Card';
@@ -23,19 +31,25 @@ export default function MyListings() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isRefetching
+    isRefetching,
   } = useInfiniteMyListings(activeTab === 'ALL' ? {} : { status: activeTab });
 
-  const listings = data?.pages.flatMap(page => page) || [];
+  const listings = data?.pages.flatMap((page) => page) || [];
 
   const getEmptyStateMessage = () => {
     switch (activeTab) {
-      case 'AVAILABLE': return "You don't have any available listings right now.";
-      case 'RESERVED': return "None of your listings are currently reserved.";
-      case 'COLLECTED': return "No listings have been collected yet.";
-      case 'EXPIRED': return "You don't have any expired listings.";
-      case 'CANCELLED': return "You haven't cancelled any listings.";
-      default: return "You haven't created any food listings yet.";
+      case 'AVAILABLE':
+        return "You don't have any available listings right now.";
+      case 'RESERVED':
+        return 'None of your listings are currently reserved.';
+      case 'COLLECTED':
+        return 'No listings have been collected yet.';
+      case 'EXPIRED':
+        return "You don't have any expired listings.";
+      case 'CANCELLED':
+        return "You haven't cancelled any listings.";
+      default:
+        return "You haven't created any food listings yet.";
     }
   };
 
@@ -58,23 +72,22 @@ export default function MyListings() {
     }
 
     return (
-      <TouchableCard 
+      <TouchableCard
         style={tw`mb-4 flex-row items-center p-3`}
         onPress={() => router.push(`/(donor)/listing/${item.id}` as any)}
       >
-        <Image 
-          source={{ uri: item.photos[0] }} 
-          style={tw`w-20 h-20 rounded-lg bg-gray-100`} 
-        />
+        <Image source={{ uri: item.photos[0] }} style={tw`w-20 h-20 rounded-lg bg-gray-100`} />
         <View style={tw`ml-4 flex-1`}>
           <View style={tw`flex-row justify-between items-start mb-1`}>
-            <Text style={tw`font-bold text-base text-gray-900 flex-1`} numberOfLines={1}>{item.foodType}</Text>
-            <Badge 
-              status={item.status} 
-            />
+            <Text style={tw`font-bold text-base text-gray-900 flex-1`} numberOfLines={1}>
+              {item.foodType}
+            </Text>
+            <Badge status={item.status} />
           </View>
-          <Text style={tw`text-gray-600 text-sm mb-2`}>{item.quantity} {item.unit}</Text>
-          
+          <Text style={tw`text-gray-600 text-sm mb-2`}>
+            {item.quantity} {item.unit}
+          </Text>
+
           {isAvailable && !isExpiredLocally && (
             <Text style={tw`text-xs font-medium ${isUrgent ? 'text-red-500' : 'text-gray-500'}`}>
               {timeText}
@@ -101,12 +114,12 @@ export default function MyListings() {
             <TouchableOpacity
               onPress={() => setActiveTab(item)}
               style={tw`px-4 py-2 rounded-full border ${
-                activeTab === item 
-                  ? 'bg-primary-600 border-primary-600' 
+                activeTab === item
+                  ? 'bg-primary-600 border-primary-600'
                   : 'bg-white border-gray-200'
               }`}
             >
-              <Text 
+              <Text
                 style={tw`text-sm font-medium ${
                   activeTab === item ? 'text-white' : 'text-gray-600'
                 }`}
@@ -123,15 +136,15 @@ export default function MyListings() {
           <ActivityIndicator size="large" color="#059669" />
         </View>
       ) : isError ? (
-        <ErrorState 
-          message={`Couldn't load listings. ${error?.message || "An error occurred."}`} 
-          onRetry={refetch as any} 
+        <ErrorState
+          message={`Couldn't load listings. ${error?.message || 'An error occurred.'}`}
+          onRetry={refetch as any}
         />
       ) : listings.length === 0 ? (
-        <EmptyState 
-          title="No Listings" 
-          subtitle={getEmptyStateMessage()} 
-          actionLabel={activeTab === 'ALL' ? "Create Listing" : undefined}
+        <EmptyState
+          title="No Listings"
+          subtitle={getEmptyStateMessage()}
+          actionLabel={activeTab === 'ALL' ? 'Create Listing' : undefined}
           onAction={activeTab === 'ALL' ? () => router.push('/(donor)/create') : undefined}
         />
       ) : (
@@ -139,6 +152,9 @@ export default function MyListings() {
           data={listings}
           keyExtractor={(item) => item.id}
           renderItem={renderItem}
+          initialNumToRender={10}
+          windowSize={21}
+          maxToRenderPerBatch={10}
           contentContainerStyle={{ padding: 16 }}
           onEndReached={() => {
             if (hasNextPage) fetchNextPage();
@@ -148,9 +164,7 @@ export default function MyListings() {
             <RefreshControl refreshing={isRefetching} onRefresh={refetch} colors={['#059669']} />
           }
           ListFooterComponent={
-            isFetchingNextPage ? (
-              <ActivityIndicator style={tw`my-4`} color="#059669" />
-            ) : null
+            isFetchingNextPage ? <ActivityIndicator style={tw`my-4`} color="#059669" /> : null
           }
         />
       )}

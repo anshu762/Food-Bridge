@@ -17,6 +17,7 @@ const queryClient = new QueryClient({
       },
       retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
       staleTime: 1000 * 60 * 5, // 5 minutes
+      gcTime: 1000 * 60 * 10, // 10 minutes
     },
   },
 });
