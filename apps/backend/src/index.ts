@@ -50,6 +50,10 @@ app.use('/verification', apiRateLimiter, verificationRoutes);
 app.use('/users', apiRateLimiter, usersRoutes);
 app.use('/admin', apiRateLimiter, adminRoutes);
 
+app.get('/', (_req, res) => {
+  res.json({ success: true, message: 'Welcome to FoodBridge API' });
+});
+
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
