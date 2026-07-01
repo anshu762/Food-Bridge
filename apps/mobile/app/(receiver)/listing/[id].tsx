@@ -4,7 +4,6 @@ import {
   Text,
   ScrollView,
   TouchableOpacity,
-  Alert,
   Linking,
   Platform,
   Dimensions,
@@ -31,7 +30,7 @@ import { Button } from '../../../src/components/ui/Button';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Card } from '../../../src/components/ui/Card';
 import { Skeleton, ErrorState } from '../../../src/components/ui/Feedback';
-import { useToast } from '../../../src/components/ui/Toast';
+import { useUI } from '../../../src/components/ui/Providers';
 import { useAuthStore } from '../../../src/store/authStore';
 import { api } from '../../../src/services/api';
 import { notifySuccess } from '../../../src/utils/haptics';
@@ -90,7 +89,7 @@ function getTimeRemaining(safeUntil: string): { text: string; urgent: boolean } 
 
 export default function ListingDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { showToast } = useToast();
+  const { showToast, showDialog } = useUI();
   const user = useAuthStore((s) => s.user);
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,29 +101,32 @@ export default function ListingDetail() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [collectedQuantity, setCollectedQuantity] = useState(0);
 
-  const fetchListing = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    else setLoading(true);
-    setError(null);
+  const fetchListing = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true);
+      else setLoading(true);
+      setError(null);
 
-    try {
-      const res = await api.get(`/listings/${id}`);
-      setListing(res.data.data);
-    } catch (err: unknown) {
-      const status =
-        err && typeof err === 'object' && 'response' in err
-          ? (err as { response: { status: number } }).response?.status
-          : null;
-      if (status === 404) {
-        setError('This listing could not be found.');
-      } else {
-        setError('Failed to load listing details.');
+      try {
+        const res = await api.get(`/listings/${id}`);
+        setListing(res.data.data);
+      } catch (err: unknown) {
+        const status =
+          err && typeof err === 'object' && 'response' in err
+            ? (err as { response: { status: number } }).response?.status
+            : null;
+        if (status === 404) {
+          setError('This listing could not be found.');
+        } else {
+          setError('Failed to load listing details.');
+        }
+      } finally {
+        setLoading(false);
+        setRefreshing(false);
       }
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  }, [id]);
+    },
+    [id],
+  );
 
   useEffect(() => {
     fetchListing();
@@ -148,18 +150,13 @@ export default function ListingDetail() {
   const handleRequestFood = () => {
     if (!listing) return;
 
-    Alert.alert(
-      'Request this food?',
-      `You are requesting: ${listing.title}\n\n${listing.quantity} ${listing.unit} of ${listing.foodType}\n\nPickup location: ${listing.pickupAddress}\n\nThe donor will be notified and can approve your request.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Request',
-          style: 'default',
-          onPress: submitRequest,
-        },
-      ],
-    );
+    showDialog({
+      title: 'Request this food?',
+      message: `You are requesting: ${listing.title}\n\n${listing.quantity} ${listing.unit} of ${listing.foodType}\n\nPickup location: ${listing.pickupAddress}\n\nThe donor will be notified and can approve your request.`,
+      cancelText: 'Cancel',
+      confirmText: 'Request',
+      onConfirm: submitRequest,
+    });
   };
 
   const submitRequest = async () => {
@@ -178,13 +175,18 @@ export default function ListingDetail() {
           : null;
 
       if (errData?.data?.error === 'LISTING_NOT_AVAILABLE') {
-        Alert.alert(
-          'Just claimed!',
-          'This listing was just reserved by someone else. Please check available listings.',
-          [{ text: 'OK', onPress: () => fetchListing() }],
-        );
+        showDialog({
+          title: 'Just claimed!',
+          message:
+            'This listing was just reserved by someone else. Please check available listings.',
+          confirmText: 'OK',
+          onConfirm: () => fetchListing(),
+        });
       } else if (errData?.data?.error?.includes('already have an active request')) {
-        showToast({ message: 'You already have an active request for this listing.', type: 'info' });
+        showToast({
+          message: 'You already have an active request for this listing.',
+          type: 'info',
+        });
         fetchListing();
       } else {
         showToast({
@@ -200,18 +202,13 @@ export default function ListingDetail() {
   const handleCollect = () => {
     if (!myRequest) return;
 
-    Alert.alert(
-      'Confirm collection?',
-      'Have you collected this food? This cannot be undone.',
-      [
-        { text: 'Not yet', style: 'cancel' },
-        {
-          text: 'Yes, collected!',
-          style: 'default',
-          onPress: () => submitCollect(),
-        },
-      ],
-    );
+    showDialog({
+      title: 'Confirm collection?',
+      message: 'Have you collected this food? This cannot be undone.',
+      cancelText: 'Not yet',
+      confirmText: 'Yes, collected!',
+      onConfirm: () => submitCollect(),
+    });
   };
 
   const submitCollect = async () => {
@@ -274,12 +271,7 @@ export default function ListingDetail() {
   }
 
   if (error || !listing) {
-    return (
-      <ErrorState
-        message={error || 'Listing not found'}
-        onRetry={() => fetchListing()}
-      />
-    );
+    return <ErrorState message={error || 'Listing not found'} onRetry={() => fetchListing()} />;
   }
 
   const requestBadge = getRequestBadgeStatus();
@@ -299,13 +291,17 @@ export default function ListingDetail() {
               pagingEnabled
               showsHorizontalScrollIndicator={false}
               onMomentumScrollEnd={(e) => {
-                setCurrentPhotoIndex(
-                  Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH),
-                );
+                setCurrentPhotoIndex(Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH));
               }}
             >
               {listing.photos.map((photo, idx) => (
-                <View key={idx} style={[{ width: SCREEN_WIDTH }, tw`h-72 bg-gray-100 items-center justify-center`]}>
+                <View
+                  key={idx}
+                  style={[
+                    { width: SCREEN_WIDTH },
+                    tw`h-72 bg-gray-100 items-center justify-center`,
+                  ]}
+                >
                   <Text style={tw`text-gray-400`}>Photo {idx + 1}</Text>
                 </View>
               ))}
@@ -344,7 +340,9 @@ export default function ListingDetail() {
 
           {/* Time remaining alert */}
           {timeRemaining.urgent && listing.status === 'AVAILABLE' && (
-            <View style={tw`bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex-row items-center`}>
+            <View
+              style={tw`bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex-row items-center`}
+            >
               <Clock size={20} color="#EF4444" />
               <Text style={tw`text-red-700 text-sm font-medium ml-2 flex-1`}>
                 Only {timeRemaining.text} left to request this food!
@@ -424,13 +422,17 @@ export default function ListingDetail() {
                   {listing.donor.phone && (
                     <TouchableOpacity style={tw`flex-row items-center mb-2`} onPress={callDonor}>
                       <Phone size={14} color="#3B6D11" />
-                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>{listing.donor.phone}</Text>
+                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
+                        {listing.donor.phone}
+                      </Text>
                     </TouchableOpacity>
                   )}
                   {listing.donor.email && (
                     <TouchableOpacity style={tw`flex-row items-center`} onPress={emailDonor}>
                       <Mail size={14} color="#3B6D11" />
-                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>{listing.donor.email}</Text>
+                      <Text style={tw`text-sm text-primary-600 ml-2 underline`}>
+                        {listing.donor.email}
+                      </Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -476,7 +478,9 @@ export default function ListingDetail() {
             <View style={tw`bg-green-50 border border-green-200 rounded-xl p-4 mb-4`}>
               <View style={tw`items-center`}>
                 <CheckCircle size={32} color="#3B6D11" />
-                <Text style={tw`text-lg font-semibold text-primary-700 mt-2`}>Request Approved!</Text>
+                <Text style={tw`text-lg font-semibold text-primary-700 mt-2`}>
+                  Request Approved!
+                </Text>
                 <Text style={tw`text-sm text-primary-600 text-center mt-1`}>
                   Pickup details are now available above. Please collect the food before it expires.
                 </Text>
@@ -537,15 +541,17 @@ export default function ListingDetail() {
       {showCelebration && (
         <View style={tw`absolute inset-0 bg-black/40 items-center justify-center z-50`}>
           <View style={tw`bg-white rounded-3xl mx-8 p-8 items-center`}>
-            <View style={tw`h-20 w-20 rounded-full bg-primary-100 items-center justify-center mb-4`}>
+            <View
+              style={tw`h-20 w-20 rounded-full bg-primary-100 items-center justify-center mb-4`}
+            >
               <CheckCircle size={48} color="#3B6D11" />
             </View>
             <Text style={tw`text-2xl font-bold text-primary-600 text-center mb-2`}>
               Food Collected!
             </Text>
             <Text style={tw`text-base text-gray-600 text-center mb-6`}>
-              Nice! You just helped save {collectedQuantity} {listing.unit} of{' '}
-              {listing.foodType} from going to waste.
+              Nice! You just helped save {collectedQuantity} {listing.unit} of {listing.foodType}{' '}
+              from going to waste.
             </Text>
             <Button
               variant="primary"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, Image, Alert, RefreshControl, Modal, TextInput } from 'react-native';
+import { View, Text, FlatList, Image, RefreshControl, Modal, TextInput } from 'react-native';
 import {
   usePendingVerifications,
   useApproveVerification,
@@ -11,13 +11,13 @@ import { XCircle, CheckCircle, ShieldAlert } from 'lucide-react-native';
 import tw from '../../src/utils/tw';
 import { formatDistanceToNow } from 'date-fns';
 import { VerificationDocument } from '../../src/services/admin';
-import { useToast } from '../../src/components/ui/Toast';
+import { useUI } from '../../src/components/ui/Providers';
 
 export default function PendingVerificationsScreen() {
   const { data, isLoading, isError, error, refetch, isRefetching } = usePendingVerifications();
   const approveMutation = useApproveVerification();
   const rejectMutation = useRejectVerification();
-  const { showToast } = useToast();
+  const { showToast, showDialog } = useUI();
 
   const [rejectModalVisible, setRejectModalVisible] = useState(false);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
@@ -26,32 +26,27 @@ export default function PendingVerificationsScreen() {
   const documents: VerificationDocument[] = data?.data || [];
 
   const handleApprove = (id: string) => {
-    Alert.alert(
-      'Approve Verification',
-      'Are you sure you want to approve this document? This will verify the user.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Approve',
-          style: 'default',
-          onPress: async () => {
-            try {
-              await approveMutation.mutateAsync(id);
-              showToast({ message: 'User verified successfully', type: 'success' });
-            } catch (err: unknown) {
-              const errorMessage =
-                err && typeof err === 'object' && 'response' in err
-                  ? String(
-                      (err as { response?: { data?: { error?: string } } }).response?.data?.error ||
-                        'Failed to approve',
-                    )
-                  : 'Failed to approve';
-              showToast({ message: errorMessage, type: 'error' });
-            }
-          },
-        },
-      ],
-    );
+    showDialog({
+      title: 'Approve Verification',
+      message: 'Are you sure you want to approve this document? This will verify the user.',
+      cancelText: 'Cancel',
+      confirmText: 'Approve',
+      onConfirm: async () => {
+        try {
+          await approveMutation.mutateAsync(id);
+          showToast({ message: 'User verified successfully', type: 'success' });
+        } catch (err: unknown) {
+          const errorMessage =
+            err && typeof err === 'object' && 'response' in err
+              ? String(
+                  (err as { response?: { data?: { error?: string } } }).response?.data?.error ||
+                    'Failed to approve',
+                )
+              : 'Failed to approve';
+          showToast({ message: errorMessage, type: 'error' });
+        }
+      },
+    });
   };
 
   const handleRejectPrompt = (id: string) => {
@@ -62,7 +57,7 @@ export default function PendingVerificationsScreen() {
 
   const submitReject = async () => {
     if (!selectedDocId || !rejectReason.trim()) {
-      Alert.alert('Error', 'Please provide a reason for rejection.');
+      showToast({ message: 'Please provide a reason for rejection.', type: 'error' });
       return;
     }
 

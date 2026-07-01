@@ -4,7 +4,6 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Alert,
   RefreshControl,
   Modal,
   TextInput,
@@ -16,7 +15,7 @@ import { Button } from '../../src/components/ui/Button';
 import { ShieldAlert, Trash2 } from 'lucide-react-native';
 import tw from '../../src/utils/tw';
 import { formatDistanceToNow } from 'date-fns';
-import { useToast } from '../../src/components/ui/Toast';
+import { useUI } from '../../src/components/ui/Providers';
 
 export default function ListingsModerationScreen() {
   const [filterStatus, setFilterStatus] = useState<string | undefined>('AVAILABLE');
@@ -34,7 +33,7 @@ export default function ListingsModerationScreen() {
   } = useAdminListings(filterStatus);
 
   const removeMutation = useRemoveListing();
-  const { showToast } = useToast();
+  const { showToast } = useUI();
 
   const [removeModalVisible, setRemoveModalVisible] = useState(false);
   const [selectedListingId, setSelectedListingId] = useState<string | null>(null);
@@ -50,7 +49,7 @@ export default function ListingsModerationScreen() {
 
   const submitRemove = async () => {
     if (!selectedListingId || !removeReason.trim()) {
-      Alert.alert('Error', 'Please provide a reason for removal.');
+      showToast({ message: 'Please provide a reason for removal.', type: 'error' });
       return;
     }
 

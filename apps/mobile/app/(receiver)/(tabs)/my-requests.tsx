@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert, RefreshControl } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import {
   Clock,
@@ -16,7 +16,7 @@ import tw from '../../../src/utils/tw';
 import { Button } from '../../../src/components/ui/Button';
 import { Badge } from '../../../src/components/ui/Badge';
 import { Skeleton, EmptyState, ErrorState } from '../../../src/components/ui/Feedback';
-import { useToast } from '../../../src/components/ui/Toast';
+import { useUI } from '../../../src/components/ui/Providers';
 import { api } from '../../../src/services/api';
 
 type Tab = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'COLLECTED';
@@ -59,7 +59,7 @@ interface RequestItem {
 }
 
 export default function MyRequests() {
-  const { showToast } = useToast();
+  const { showToast, showDialog } = useUI();
   const [activeTab, setActiveTab] = useState<Tab>('PENDING');
   const [allRequests, setAllRequests] = useState<RequestItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -107,18 +107,14 @@ export default function MyRequests() {
   });
 
   const handleCancel = (request: RequestItem) => {
-    Alert.alert(
-      'Cancel Request?',
-      `Are you sure you want to cancel your request for "${request.listing?.title}"?`,
-      [
-        { text: 'Keep It', style: 'cancel' },
-        {
-          text: 'Cancel Request',
-          style: 'destructive',
-          onPress: () => submitCancel(request.id),
-        },
-      ],
-    );
+    showDialog({
+      title: 'Cancel Request?',
+      message: `Are you sure you want to cancel your request for "${request.listing?.title}"?`,
+      cancelText: 'Keep It',
+      confirmText: 'Cancel Request',
+      type: 'destructive',
+      onConfirm: () => submitCancel(request.id),
+    });
   };
 
   const submitCancel = async (requestId: string) => {
@@ -140,18 +136,13 @@ export default function MyRequests() {
   };
 
   const handleCollect = (request: RequestItem) => {
-    Alert.alert(
-      'Confirm collection?',
-      `Have you collected "${request.listing?.title}"? This cannot be undone.`,
-      [
-        { text: 'Not yet', style: 'cancel' },
-        {
-          text: 'Yes, collected!',
-          style: 'default',
-          onPress: () => submitCollect(request),
-        },
-      ],
-    );
+    showDialog({
+      title: 'Confirm collection?',
+      message: `Have you collected "${request.listing?.title}"? This cannot be undone.`,
+      cancelText: 'Not yet',
+      confirmText: 'Yes, collected!',
+      onConfirm: () => submitCollect(request),
+    });
   };
 
   const submitCollect = async (request: RequestItem) => {

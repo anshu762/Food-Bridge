@@ -1,14 +1,6 @@
 import { useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  Alert,
-  RefreshControl,
-  TextInput,
-} from 'react-native';
-import { showConfirm } from '../utils/confirm';
+import { View, Text, ScrollView, TouchableOpacity, RefreshControl, TextInput } from 'react-native';
+import { useUI } from './ui/Providers';
 import {
   User,
   Shield,
@@ -99,6 +91,7 @@ function ProfileSkeleton() {
 
 export default function ProfileScreen() {
   const { user, logout } = useAuthStore();
+  const { showToast, showDialog } = useUI();
   const { data: profile, isLoading, isError, refetch } = useProfile();
   const { mutateAsync: updateProfile, isPending: updating } = useUpdateProfile();
   const { mutateAsync: changePassword, isPending: changingPwd } = useChangePassword();
@@ -134,51 +127,51 @@ export default function ProfileScreen() {
 
   const handleChangePassword = useCallback(async () => {
     if (!currentPwd || !newPwd) {
-      Alert.alert('Error', 'Please fill in both fields');
+      showToast({ message: 'Please fill in both fields', type: 'error' });
       return;
     }
     if (newPwd.length < 8) {
-      Alert.alert('Error', 'New password must be at least 8 characters');
+      showToast({ message: 'New password must be at least 8 characters', type: 'error' });
       return;
     }
     try {
       await changePassword({ currentPassword: currentPwd, newPassword: newPwd });
-      Alert.alert('Success', 'Password changed successfully');
+      showToast({ message: 'Password changed successfully', type: 'success' });
       notifySuccess();
       setShowPasswordForm(false);
       setCurrentPwd('');
       setNewPwd('');
     } catch (err: any) {
       const msg = err?.response?.data?.error || 'Failed to change password';
-      Alert.alert('Error', msg);
+      showToast({ message: msg, type: 'error' });
     }
   }, [changePassword, currentPwd, newPwd]);
 
   const handleDeleteAccount = useCallback(() => {
-    showConfirm(
-      'Delete Account',
-      'This action is irreversible. Your account will be permanently deleted and all your personal information will be removed. Your past listings and requests will be anonymized to preserve community data.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete My Account',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteAccount();
-              await logout();
-            } catch {}
-          },
-        },
-      ],
-    );
+    showDialog({
+      title: 'Delete Account',
+      message:
+        'This action is irreversible. Your account will be permanently deleted and all your personal information will be removed. Your past listings and requests will be anonymized to preserve community data.',
+      cancelText: 'Cancel',
+      confirmText: 'Delete My Account',
+      type: 'destructive',
+      onConfirm: async () => {
+        try {
+          await deleteAccount();
+          await logout();
+        } catch {}
+      },
+    });
   }, [deleteAccount, logout]);
 
   const handleLogout = useCallback(() => {
-    showConfirm('Logout', 'Are you sure you want to log out?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', onPress: () => logout() },
-    ]);
+    showDialog({
+      title: 'Logout',
+      message: 'Are you sure you want to log out?',
+      cancelText: 'Cancel',
+      confirmText: 'Logout',
+      onConfirm: () => logout(),
+    });
   }, [logout]);
 
   const handleUploadVerificationDoc = useCallback(async () => {
@@ -186,7 +179,11 @@ export default function ProfileScreen() {
     if (url) {
       try {
         await uploadDoc(url);
-        Alert.alert('Submitted', 'Your verification document has been uploaded for review.');
+        showDialog({
+          title: 'Submitted',
+          message: 'Your verification document has been uploaded for review.',
+          confirmText: 'OK',
+        });
       } catch {}
     }
   }, [pickAndUpload, uploadDoc]);
@@ -196,7 +193,11 @@ export default function ProfileScreen() {
     if (url) {
       try {
         await uploadDoc(url);
-        Alert.alert('Re-submitted', 'Your new verification document has been uploaded for review.');
+        showDialog({
+          title: 'Re-submitted',
+          message: 'Your new verification document has been uploaded for review.',
+          confirmText: 'OK',
+        });
       } catch {}
     }
   }, [pickAndUpload, uploadDoc]);

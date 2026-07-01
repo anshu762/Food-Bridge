@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Dimensions } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
+import { View, Text, Dimensions, Animated } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button } from '../src/components/ui/Button';
@@ -27,6 +27,7 @@ export default function Onboarding() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [checking, setChecking] = useState(true);
   const { user, isHydrated } = useAuthStore();
+  const scrollX = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -51,10 +52,13 @@ export default function Onboarding() {
 
   if (checking) return null;
 
-  const handleScroll = (event: any) => {
-    const slide = Math.round(event.nativeEvent.contentOffset.x / width);
-    setCurrentSlide(slide);
-  };
+  const handleScroll = Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {
+    useNativeDriver: false,
+    listener: (event: any) => {
+      const slide = Math.round(event.nativeEvent.contentOffset.x / width);
+      if (slide !== currentSlide) setCurrentSlide(slide);
+    },
+  });
 
   const completeOnboarding = async () => {
     await AsyncStorage.setItem('hasSeenOnboarding', 'true');
@@ -67,40 +71,62 @@ export default function Onboarding() {
   };
 
   return (
-    <View style={tw`flex-1 bg-white`}>
-      <ScrollView
+    <View style={tw`flex-1 bg-surface`}>
+      <Animated.ScrollView
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={handleScroll}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         style={tw`flex-1`}
       >
         {slides.map((slide, index) => (
-          <View key={index} style={[{ width }, tw`flex-1 items-center justify-center px-6`]}>
-            <View style={tw`w-full aspect-square bg-primary-50 rounded-full mb-8 items-center justify-center`}>
-              <Text style={tw`text-primary-600 text-6xl font-bold`}>FB</Text>
+          <View key={index} style={[{ width }, tw`flex-1 items-center justify-center p-24`]}>
+            <View
+              style={tw`w-full aspect-square bg-primary-50 rounded-pill mb-32 items-center justify-center`}
+            >
+              <Text style={tw`text-primary text-display`}>FB</Text>
             </View>
-            <Text style={tw`text-3xl font-bold text-gray-900 text-center mb-4`}>{slide.title}</Text>
-            <Text style={tw`text-lg text-gray-500 text-center`}>{slide.subtitle}</Text>
+            <Text style={tw`text-h1 text-neutral-900 text-center mb-16`}>{slide.title}</Text>
+            <Text style={tw`text-body text-neutral-600 text-center`}>{slide.subtitle}</Text>
           </View>
         ))}
-      </ScrollView>
+      </Animated.ScrollView>
 
-      <View style={tw`px-6 pb-12 pt-4`}>
-        <View style={tw`flex-row justify-center mb-8`}>
-          {slides.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                tw`h-2 rounded-full mx-1`,
-                currentSlide === index ? tw`w-8 bg-primary-600` : tw`w-2 bg-gray-200`,
-              ]}
-            />
-          ))}
+      <View style={tw`p-24 pb-48 pt-16`}>
+        <View style={tw`flex-row justify-center mb-32`}>
+          {slides.map((_, index) => {
+            const inputRange = [(index - 1) * width, index * width, (index + 1) * width];
+
+            const dotWidth = scrollX.interpolate({
+              inputRange,
+              outputRange: [8, 32, 8],
+              extrapolate: 'clamp',
+            });
+
+            const opacity = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: 'clamp',
+            });
+
+            const backgroundColor = scrollX.interpolate({
+              inputRange,
+              outputRange: ['#E5E7EB', '#1B7A4D', '#E5E7EB'],
+              extrapolate: 'clamp',
+            });
+
+            return (
+              <Animated.View
+                key={index}
+                style={[tw`h-8 rounded-pill mx-4`, { width: dotWidth, opacity, backgroundColor }]}
+              />
+            );
+          })}
         </View>
 
-        <Button variant="primary" fullWidth style={tw`mb-4`} onPress={completeOnboardingRegister}>
-          Get Started (Register)
+        <Button variant="primary" fullWidth style={tw`mb-16`} onPress={completeOnboardingRegister}>
+          Get Started
         </Button>
         <Button variant="ghost" fullWidth onPress={completeOnboarding}>
           I already have an account
